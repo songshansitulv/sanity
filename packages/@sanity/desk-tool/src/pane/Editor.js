@@ -859,6 +859,8 @@ export default withRouterHOC(
                 currentRev={value._rev}
                 lastEdited={new Date(value._updatedAt)}
                 publishedRev={published && published._rev}
+                published={published}
+                draft={draft}
               />
             </div>
           )}
