@@ -898,7 +898,7 @@ export default withRouterHOC(
                 />
                 {value && (
                   <span className={styles.editedTime} onClick={this.handleToggleHistory}>
-                    {historyValue ? '' : 'Edited '}
+                    {historyValue && 'Edited '}
                     <TimeAgo time={historyValue ? historyValue._updatedAt : value._updatedAt} />
                   </span>
                 )}
