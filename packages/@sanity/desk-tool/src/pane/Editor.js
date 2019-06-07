@@ -563,18 +563,20 @@ export default withRouterHOC(
               </span>
             </Tooltip>
           )}
-          {value && !showSavingStatus && !isReconnecting && (
-            <Tooltip
-              className={styles.syncStatusSynced}
-              arrow
-              theme="light"
-              size="small"
-              distance="0"
-              title="Synced with the Sanity cloud"
-            >
-              <CheckIcon /> Synced {this.isLiveEditEnabled() && ' (live)'}
-            </Tooltip>
-          )}
+          {value &&
+            !showSavingStatus &&
+            !isReconnecting && (
+              <Tooltip
+                className={styles.syncStatusSynced}
+                arrow
+                theme="light"
+                size="small"
+                distance="0"
+                title="Synced with the Sanity cloud"
+              >
+                <CheckIcon /> Synced {this.isLiveEditEnabled() && ' (live)'}
+              </Tooltip>
+            )}
           {(errors.length > 0 || warnings.length > 0) && (
             <Tooltip
               arrow
@@ -668,7 +670,8 @@ export default withRouterHOC(
               >
                 <div>
                   <div className={styles.popOverText}>
-                    <strong>Are you sure</strong> you want to discard all changes since last published?
+                    <strong>Are you sure</strong> you want to discard all changes since last
+                    published?
                   </div>
                   <ButtonGrid>
                     <Button kind="simple" onClick={this.handleCancelDiscard}>
@@ -692,7 +695,7 @@ export default withRouterHOC(
     }
 
     renderHistoryInfo = () => {
-      const {historyValue, historyStatus, isReconnecting} = this.props
+      const {historyStatus, isReconnecting} = this.props
       const {showConfirmHistoryRestore} = this.state
       if (historyStatus && historyStatus != 'unpublished') {
         return null
@@ -953,18 +956,19 @@ export default withRouterHOC(
                   </em>
                 </Snackbar>
               )}
-              {transactionResult && transactionResult.type === 'error' && (
-                <Snackbar
-                  kind="danger"
-                  action={{title: 'Ok, got it'}}
-                  onAction={onClearTransactionResult}
-                >
-                  <div>
-                    {transactionResult.message}
-                    <details>{transactionResult.error.message}</details>
-                  </div>
-                </Snackbar>
-              )}
+              {transactionResult &&
+                transactionResult.type === 'error' && (
+                  <Snackbar
+                    kind="danger"
+                    action={{title: 'Ok, got it'}}
+                    onAction={onClearTransactionResult}
+                  >
+                    <div>
+                      {transactionResult.message}
+                      <details>{transactionResult.error.message}</details>
+                    </div>
+                  </Snackbar>
+                )}
             </div>
           </Pane>
         </div>
