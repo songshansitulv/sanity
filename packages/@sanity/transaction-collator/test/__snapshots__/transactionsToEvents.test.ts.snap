@@ -1,90 +1,148 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`groups  1`] = `
+exports[`classifies transactions to events  1`] = `
 Array [
   Object {
+    "displayDocumentId": "drafts.fkaBMrgakwvEbFBu2QkLGy",
     "documentIDs": Array [
-      "drafts.6747618f-b457-4709-b6e1-3c1d065a4ab2",
+      "drafts.fkaBMrgakwvEbFBu2QkLGy",
     ],
-    "endTime": 2019-06-03T11:55:37.937Z,
-    "rev": "s5zj3r-rq7-xho-v5m-l2rs5yl9d",
-    "startTime": 2019-06-03T11:55:37.937Z,
+    "endTime": 2019-03-25T15:41:23.171Z,
+    "rev": "fkaBMrgakwvEbFBu2QkLEt",
+    "startTime": 2019-03-25T15:41:23.171Z,
     "type": "created",
     "userIds": Array [
-      "pgVUfeKYb",
+      "pVbf95zEZ",
     ],
   },
   Object {
+    "displayDocumentId": "drafts.fkaBMrgakwvEbFBu2QkLGy",
     "documentIDs": Array [
-      "drafts.6747618f-b457-4709-b6e1-3c1d065a4ab2",
+      "drafts.fkaBMrgakwvEbFBu2QkLGy",
     ],
-    "endTime": 2019-06-03T11:56:12.520Z,
-    "rev": "mtqmnz-8bh-88t-4g2-p8bmu239u",
-    "startTime": 2019-06-03T11:56:11.506Z,
-    "type": "edited",
-    "userIds": Array [
-      "pgVUfeKYb",
-    ],
-  },
-  Object {
-    "documentIDs": Array [
-      "6747618f-b457-4709-b6e1-3c1d065a4ab2",
-      "drafts.6747618f-b457-4709-b6e1-3c1d065a4ab2",
-    ],
-    "endTime": 2019-06-03T11:58:29.406Z,
-    "rev": "XEca2JZuDCj6zhbCcOfKvQ",
-    "startTime": 2019-06-03T11:58:29.406Z,
+    "endTime": 2019-03-25T15:41:37.865Z,
+    "rev": "gixzu4-34u-j43-03e-qt673a09a",
+    "startTime": 2019-03-25T15:41:37.865Z,
     "type": "published",
     "userIds": Array [
-      "pgVUfeKYb",
+      "pVbf95zEZ",
     ],
   },
   Object {
+    "displayDocumentId": "drafts.fkaBMrgakwvEbFBu2QkLGy",
     "documentIDs": Array [
-      "drafts.6747618f-b457-4709-b6e1-3c1d065a4ab2",
+      "drafts.fkaBMrgakwvEbFBu2QkLGy",
     ],
-    "endTime": 2019-06-03T12:16:45.247Z,
-    "rev": "lmxmvi-957-n6p-23u-oqz1x6imx",
-    "startTime": 2019-06-03T12:16:45.247Z,
+    "endTime": 2019-03-25T15:41:42.943Z,
+    "rev": "k44l12-nkc-j5r-z9v-na2a6eskj",
+    "startTime": 2019-03-25T15:41:41.996Z,
     "type": "edited",
     "userIds": Array [
-      "pgVUfeKYb",
+      "pVbf95zEZ",
     ],
   },
   Object {
+    "displayDocumentId": "fkaBMrgakwvEbFBu2QkLGy",
     "documentIDs": Array [
-      "drafts.6747618f-b457-4709-b6e1-3c1d065a4ab2",
+      "fkaBMrgakwvEbFBu2QkLGy",
+      "drafts.fkaBMrgakwvEbFBu2QkLGy",
     ],
-    "endTime": 2019-06-04T06:55:33.652Z,
-    "rev": "innnzw-a5s-tbz-613-s6iawjt27",
-    "startTime": 2019-06-04T06:55:33.652Z,
-    "type": "edited",
-    "userIds": Array [
-      "pgVUfeKYb",
-    ],
-  },
-  Object {
-    "documentIDs": Array [
-      "6747618f-b457-4709-b6e1-3c1d065a4ab2",
-      "drafts.6747618f-b457-4709-b6e1-3c1d065a4ab2",
-    ],
-    "endTime": 2019-06-04T07:07:18.043Z,
-    "rev": "dhbYidCJj0BAUSrFz8pXLN",
-    "startTime": 2019-06-04T07:07:18.043Z,
+    "endTime": 2019-03-25T15:41:44.278Z,
+    "rev": "Of03LgVbqcv4tQEgg3hDwe",
+    "startTime": 2019-03-25T15:41:44.278Z,
     "type": "published",
     "userIds": Array [
-      "pgVUfeKYb",
+      "pVbf95zEZ",
     ],
   },
   Object {
+    "displayDocumentId": undefined,
     "documentIDs": Array [
-      "6747618f-b457-4709-b6e1-3c1d065a4ab2",
-      "drafts.6747618f-b457-4709-b6e1-3c1d065a4ab2",
+      "fkaBMrgakwvEbFBu2QkLGy",
     ],
-    "endTime": 2019-06-04T07:15:01.639Z,
-    "rev": "dhbYidCJj0BAUSrFz8pdjl",
-    "startTime": 2019-06-04T07:15:01.639Z,
+    "endTime": 2019-03-25T15:41:50.866Z,
+    "rev": "fkaBMrgakwvEbFBu2QkM4u",
+    "startTime": 2019-03-25T15:41:50.866Z,
+    "type": "deleted",
+    "userIds": Array [
+      "pVbf95zEZ",
+    ],
+  },
+  Object {
+    "displayDocumentId": "fkaBMrgakwvEbFBu2QkLGy",
+    "documentIDs": Array [
+      "fkaBMrgakwvEbFBu2QkLGy",
+    ],
+    "endTime": 2019-03-25T15:41:51.943Z,
+    "rev": "nemgw4-86l-fpq-9pd-m2e4i53dz",
+    "startTime": 2019-03-25T15:41:51.943Z,
+    "type": "published",
+    "userIds": Array [
+      "pVbf95zEZ",
+    ],
+  },
+  Object {
+    "displayDocumentId": "drafts.fkaBMrgakwvEbFBu2QkLGy",
+    "documentIDs": Array [
+      "fkaBMrgakwvEbFBu2QkLGy",
+      "drafts.fkaBMrgakwvEbFBu2QkLGy",
+    ],
+    "endTime": 2019-03-25T15:41:59.300Z,
+    "rev": "Of03LgVbqcv4tQEgg3hEBx",
+    "startTime": 2019-03-25T15:41:59.300Z,
     "type": "unpublished",
+    "userIds": Array [
+      "pVbf95zEZ",
+    ],
+  },
+  Object {
+    "displayDocumentId": "drafts.fkaBMrgakwvEbFBu2QkLGy",
+    "documentIDs": Array [
+      "drafts.fkaBMrgakwvEbFBu2QkLGy",
+    ],
+    "endTime": 2019-06-14T09:53:55.912Z,
+    "rev": "lejbbu-fxf-sst-lso-hfwdci0f4",
+    "startTime": 2019-06-14T09:53:55.912Z,
+    "type": "edited",
+    "userIds": Array [
+      "pVbf95zEZ",
+    ],
+  },
+  Object {
+    "displayDocumentId": "drafts.fkaBMrgakwvEbFBu2QkLGy",
+    "documentIDs": Array [
+      "drafts.fkaBMrgakwvEbFBu2QkLGy",
+    ],
+    "endTime": 2019-06-18T07:57:59.535Z,
+    "rev": "ho1r77-dbh-2fj-l3r-qh3ja4vba",
+    "startTime": 2019-06-18T07:57:59.535Z,
+    "type": "edited",
+    "userIds": Array [
+      "pgVUfeKYb",
+    ],
+  },
+  Object {
+    "displayDocumentId": "drafts.fkaBMrgakwvEbFBu2QkLGy",
+    "documentIDs": Array [
+      "drafts.fkaBMrgakwvEbFBu2QkLGy",
+    ],
+    "endTime": 2019-06-18T09:45:02.963Z,
+    "rev": "tso40v-gg0-pph-121-r4rtj8ldy",
+    "startTime": 2019-06-18T09:45:02.083Z,
+    "type": "edited",
+    "userIds": Array [
+      "phFvUEyXV",
+    ],
+  },
+  Object {
+    "displayDocumentId": "drafts.fkaBMrgakwvEbFBu2QkLGy",
+    "documentIDs": Array [
+      "drafts.fkaBMrgakwvEbFBu2QkLGy",
+    ],
+    "endTime": 2019-06-18T12:48:09.924Z,
+    "rev": "cp0eug-bog-lda-54v-foxeed4e1",
+    "startTime": 2019-06-18T12:47:09.934Z,
+    "type": "edited",
     "userIds": Array [
       "pgVUfeKYb",
     ],
