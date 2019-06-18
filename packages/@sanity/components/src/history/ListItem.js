@@ -1,4 +1,3 @@
-import AnchorButton from 'part:@sanity/components/buttons/anchor'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Tooltip} from 'react-tippy'
@@ -65,6 +64,7 @@ export default class HistoryListItem extends React.PureComponent {
   }
 
   handleClick = evt => {
+    // TODO: removed this when we know which version to view
     if (this.props.type === 'truncated') return
     this.props.onClick(evt)
   }
