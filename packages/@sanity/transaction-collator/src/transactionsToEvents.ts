@@ -22,6 +22,8 @@ export function transactionsToEvents(
       .map((transaction, index) => {
         return mapToEvents(transaction, documentIds, index)
       })
+      // Filter out discardDraft (no longer possible in the history studio release)
+      .filter(event => event.type !== 'discardDraft')
       // Chunk and group edit events
       .reduce(reduceEdits, [])
   )
@@ -134,21 +136,21 @@ export function mutationsToEventTypeAndDocumentId(mutations: Mutation[], transac
     }
   }
 
-  // Restored to previous version (return edited for now)
+  // Restored to previous version
   if (
     ((createOrReplacePatch && createOrReplacePatch._id.startsWith('drafts.')) ||
       (createPatch && createPatch._id.startsWith('drafts.')) ||
       (createIfNotExistsPatch && createIfNotExistsPatch._id.startsWith('drafts.')))
   ) {
     return {
-      type: 'edited',
+      type: 'edited', // (return 'edited' for now, should be 'restored' in the future when we can tag transactions)
       documentId: createValue && createValue._id
     }
   }
 
   // Discard drafted changes
   if (mutations.length === 1 && deletePatch && deletePatch.id.startsWith('drafts.')) {
-    return {type: 'discardDraft', documentId: deletePatch.id}
+    return {type: 'discardDraft', documentId: undefined}
   }
 
   // Truncated history
@@ -168,7 +170,6 @@ export function mutationsToEventTypeAndDocumentId(mutations: Mutation[], transac
   }
 
   // Unknown!
-  console.log(mutations)
   return {type: 'unknown', documentId: undefined}
 }
 
