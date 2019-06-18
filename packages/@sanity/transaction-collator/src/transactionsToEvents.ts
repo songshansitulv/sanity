@@ -154,7 +154,6 @@ export function mutationsToEventTypeAndDocumentId(mutations: Mutation[], transac
   if (patchedMutation && patchedMutation.patch) {
     return {type: 'edited', documentId: patchedMutation.patch.id}
   }
-
   return {type: 'unknown', documentId: undefined}
 }
 
@@ -164,7 +163,7 @@ function findUserIds(transaction: Transaction, type: EventType): string[] {
     const createSquasedMut = transaction.mutations.find(mut => mut.createSquashed !== undefined)
     const createSquasedPatch = createSquasedMut && createSquasedMut.createSquashed
     if (createSquasedPatch) {
-      return createSquasedPatch._authors
+      return createSquasedPatch.authors
     }
   }
   // Default is to return the transaction author
