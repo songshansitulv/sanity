@@ -723,7 +723,7 @@ export default withRouterHOC(
 
     renderStaticContent = () => {
       const {draft} = this.props
-      const {historyValue, historyStatus} = this.state
+      const {historyValue} = this.state
 
       return (
         <div
@@ -733,7 +733,7 @@ export default withRouterHOC(
               : styles.publishInfoHidden
           }
         >
-          {historyValue && historyStatus !== 'unpublished' && this.renderHistoryInfo()}
+          {historyValue && this.renderHistoryInfo()}
           {!historyValue && draft && this.renderPublishInfo()}
         </div>
       )
