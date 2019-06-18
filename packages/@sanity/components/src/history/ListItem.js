@@ -24,6 +24,7 @@ export default class HistoryListItem extends React.PureComponent {
     onKeyDown: PropTypes.func,
     rev: PropTypes.string,
     tooltip: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     users: PropTypes.arrayOf(
       PropTypes.shape({
         name: PropTypes.string,
@@ -35,8 +36,8 @@ export default class HistoryListItem extends React.PureComponent {
   }
 
   static defaultProps = {
-    status: 'unknown',
-    title: 'Untitled',
+    status: 'Edited',
+    title: undefined,
     onClick: noop,
     onKeyUp: noop,
     onKeyDown: noop,
@@ -64,7 +65,7 @@ export default class HistoryListItem extends React.PureComponent {
   }
 
   handleClick = evt => {
-    if (this.props.status === 'truncated') return
+    if (this.props.type === 'truncated') return
     this.props.onClick(evt)
   }
 
@@ -77,42 +78,47 @@ export default class HistoryListItem extends React.PureComponent {
       users,
       children,
       isCurrentVersion,
-      // onClick,
       rev,
       onKeyUp,
       onKeyDown,
-      tooltip
+      tooltip,
+      type
     } = this.props
     const selectionClassName = isSelected ? styles.selected : styles.unSelected
-    const className = status === 'truncated' ? styles.disabled : selectionClassName
+    const className = type === 'truncated' ? styles.disabled : selectionClassName
 
     return (
       <div
         className={className}
-        data-status={status}
+        data-type={type}
         data-is-current-version={isCurrentVersion}
         data-is-selected={isSelected}
         data-rev={rev}
         onClick={this.handleClick}
-        tabIndex={status === 'truncated' ? null : '0'}
+        tabIndex={type === 'truncated' ? null : '0'}
         onKeyUp={onKeyUp}
         onKeyDown={onKeyDown}
         title={tooltip}
         ref={this._rootElement}
       >
-        <EventIcon className={styles.icon} status={status} />
+        <EventIcon className={styles.icon} type={type} />
         <div className={styles.startLine} aria-hidden="true" />
         <div className={styles.endLine} aria-hidden="true" />
         <div className={styles.status}>{status}</div>
-        <div className={styles.title}>{title}</div>
-        {status === 'truncated' && (
+        {title && type !== 'truncated' && <div className={styles.title}>{title}</div>}
+        {type === 'truncated' && (
           <div className={styles.truncatedInfo}>
-            <p>Read about retention times and plans in our documentation.</p>
-            <div>
-              <AnchorButton href="https://www.sanity.io/docs#" target="_blank">
-                Read documentation
-              </AnchorButton>
-            </div>
+            <p>
+              Read about retention times and plans in{' '}
+              <a
+                href="https://www.sanity.io/docs/content-studio/history-experience"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                our documentation
+              </a>
+              .
+            </p>
           </div>
         )}
         {users &&

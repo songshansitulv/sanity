@@ -116,7 +116,7 @@
 }
 
 .truncatedInfo {
-  margin: 0 0 var(--medium-padding);
+  margin: var(--small-padding) 0 var(--medium-padding) 0;
 
   @nest & p {
     font-size: var(--font-size-xsmall, 0.75rem);

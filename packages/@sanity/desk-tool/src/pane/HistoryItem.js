@@ -19,9 +19,9 @@ function getDateString(date) {
 }
 
 function getHumanReadableStatus(type) {
-  if (type === 'discardDraft') {
-    return 'Discarded Edits'
-  }
+  if (type === 'discardDraft') return 'Discarded Edits'
+  if (type === 'truncated') return 'Truncated Events'
+  if (type === 'unknown') return 'Edited'
   return type
 }
 
@@ -105,6 +105,7 @@ export default class HistoryItem extends React.PureComponent {
       <HistoryListItem
         isCurrentVersion={isCurrentVersion}
         status={getHumanReadableStatus(type)}
+        type={type}
         title={getDateString(endTime)}
         tooltip={format(endTime, dateFormat)}
         rev={rev}
