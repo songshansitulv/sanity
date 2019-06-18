@@ -239,13 +239,6 @@ export default withDocumentType(
       this.draft = null
     }
 
-    handleDiscardDraft = () => {
-      this.draft.delete()
-      this.draft.commit().subscribe(() => {
-        // todo: error handling
-      })
-    }
-
     handleDelete = () => {
       const documentId = this.props.options.id
 
@@ -592,7 +585,6 @@ export default withDocumentType(
           isCreatingDraft={isCreatingDraft}
           onDelete={this.handleDelete}
           onClearTransactionResult={this.handleClearTransactionResult}
-          onDiscardDraft={this.handleDiscardDraft}
           onPublish={this.handlePublish}
           onRestore={this.handleRestoreRevision}
           onUnpublish={this.handleUnpublish}

@@ -1,4 +1,4 @@
-/* eslint-disable complexity */
+/* eslint-disable complexity, camelcase */
 import PropTypes from 'prop-types'
 // Connects the FormBuilder with various sanity roles
 import React from 'react'
@@ -68,16 +68,6 @@ const getDuplicateItem = (draft, published) => ({
   isDisabled: !draft && !published
 })
 
-const getDiscardItem = (draft, published, isLiveEditEnabled) =>
-  isLiveEditEnabled
-    ? null
-    : {
-        action: 'discard',
-        title: 'Discard changes…',
-        icon: UndoIcon,
-        isDisabled: !draft || !published
-      }
-
 const getUnpublishItem = (draft, published, isLiveEditEnabled) =>
   isLiveEditEnabled
     ? null
@@ -129,9 +119,7 @@ const getProductionPreviewItem = (draft, published) => {
   try {
     previewUrl = resolveProductionPreviewUrl(snapshot)
   } catch (error) {
-    error.message = `An error was thrown while trying to get production preview url: ${
-      error.message
-    }`
+    error.message = `An error was thrown while trying to get production preview url: ${error.message}`
     // eslint-disable-next-line no-console
     console.error(error)
     return null
@@ -157,7 +145,6 @@ const getProductionPreviewItem = (draft, published) => {
 const getMenuItems = (enabledActions, draft, published, isLiveEditEnabled) =>
   [
     getProductionPreviewItem,
-    enabledActions.includes('delete') && getDiscardItem,
     enabledActions.includes('delete') && getUnpublishItem,
     enabledActions.includes('create') && getDuplicateItem,
     getHistoryMenuItem,
@@ -175,7 +162,6 @@ const INITIAL_STATE = {
   isMenuOpen: false,
   isCreatingDraft: false,
   showSavingStatus: false,
-  showConfirmDiscard: false,
   showConfirmDelete: false,
   showConfirmUnpublish: false,
   showValidationTooltip: false,
@@ -211,7 +197,6 @@ export default withRouterHOC(
       onDelete: PropTypes.func,
       onCreate: PropTypes.func,
       onChange: PropTypes.func,
-      onDiscardDraft: PropTypes.func,
       onPublish: PropTypes.func,
       onRestore: PropTypes.func,
       onUnpublish: PropTypes.func,
@@ -294,7 +279,7 @@ export default withRouterHOC(
     }
 
     // @todo move publishing notification out of this component
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
       this.setState({didPublish: this.props.isPublishing && !nextProps.isPublishing})
 
       if (this.props.isSaving && !nextProps.isSaving) {
@@ -406,20 +391,10 @@ export default withRouterHOC(
       this.setState({showConfirmDelete: false})
     }
 
-    handleCancelDiscard = () => {
-      this.setState({showConfirmDiscard: false})
-    }
-
     handleConfirmUnpublish = () => {
       const {onUnpublish} = this.props
       onUnpublish()
       this.setState({showConfirmUnpublish: false})
-    }
-
-    handleConfirmDiscard = () => {
-      const {onDiscardDraft, draft} = this.props
-      onDiscardDraft(draft)
-      this.setState({showConfirmDiscard: false})
     }
 
     handleShowHistoryRestore = () => {
@@ -444,11 +419,9 @@ export default withRouterHOC(
     }
 
     handleConfirmDelete = () => {
-      const {onDelete, onDiscardDraft, published} = this.props
+      const {onDelete, published} = this.props
       if (published) {
         onDelete()
-      } else {
-        onDiscardDraft()
       }
       this.setState({showConfirmDelete: false})
     }
@@ -464,10 +437,6 @@ export default withRouterHOC(
 
       if (item.action === 'delete') {
         this.setState({showConfirmDelete: true})
-      }
-
-      if (item.action === 'discard') {
-        this.setState({showConfirmDiscard: true})
       }
 
       if (item.action === 'unpublish') {
@@ -672,33 +641,6 @@ export default withRouterHOC(
             </Button>
           </Tooltip>
           <div className={styles.publishInfoUndoButton}>
-            {/* {published && (
-              <Button kind="simple" onClick={() => this.setState({showConfirmDiscard: true})}>
-                Discard changes
-              </Button>
-            )} */}
-            {this.state.showConfirmDiscard && (
-              <PopOverDialog
-                onClickOutside={this.handleCancelDiscard}
-                useOverlay={false}
-                hasAnimation
-              >
-                <div>
-                  <div className={styles.popOverText}>
-                    <strong>Are you sure</strong> you want to discard all changes since last
-                    published?
-                  </div>
-                  <ButtonGrid>
-                    <Button kind="simple" onClick={this.handleCancelDiscard}>
-                      Cancel
-                    </Button>
-                    <Button color="danger" onClick={this.handleConfirmDiscard}>
-                      Discard
-                    </Button>
-                  </ButtonGrid>
-                </div>
-              </PopOverDialog>
-            )}
             {!published && (
               <Button kind="simple" onClick={() => this.setState({showConfirmDelete: true})}>
                 Delete document
