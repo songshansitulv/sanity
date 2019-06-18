@@ -5,6 +5,7 @@ import {Tooltip} from 'react-tippy'
 import PresenceCircle from '../presence/PresenceCircle'
 import PresenceList from '../presence/PresenceList'
 import colorHasher from '../presence/colorHasher'
+import EventIcon from './EventIcon'
 
 import styles from './styles/ListItem.modules.css'
 
@@ -62,6 +63,11 @@ export default class HistoryListItem extends React.PureComponent {
     }
   }
 
+  handleClick = evt => {
+    if (this.props.status === 'truncated') return
+    this.props.onClick(evt)
+  }
+
   // eslint-disable-next-line complexity
   render() {
     const {
@@ -71,7 +77,7 @@ export default class HistoryListItem extends React.PureComponent {
       users,
       children,
       isCurrentVersion,
-      onClick,
+      // onClick,
       rev,
       onKeyUp,
       onKeyDown,
@@ -79,24 +85,22 @@ export default class HistoryListItem extends React.PureComponent {
     } = this.props
     const selectionClassName = isSelected ? styles.selected : styles.unSelected
     const className = status === 'truncated' ? styles.disabled : selectionClassName
-    const handleClick = evt => {
-      if (status === 'truncated') return
-      onClick(evt)
-    }
 
     return (
       <div
         className={className}
         data-status={status}
         data-is-current-version={isCurrentVersion}
+        data-is-selected={isSelected}
         data-rev={rev}
-        onClick={handleClick}
+        onClick={this.handleClick}
         tabIndex={status === 'truncated' ? null : '0'}
         onKeyUp={onKeyUp}
         onKeyDown={onKeyDown}
         title={tooltip}
         ref={this._rootElement}
       >
+        <EventIcon className={styles.icon} status={status} />
         <div className={styles.startLine} aria-hidden="true" />
         <div className={styles.endLine} aria-hidden="true" />
         <div className={styles.status}>{status}</div>

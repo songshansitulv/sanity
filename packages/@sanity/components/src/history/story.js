@@ -55,7 +55,11 @@ storiesOf('History')
     return (
       <Sanity part="part:@sanity/components/history/list-item" propTables={[ListItem]}>
         <ListItem
-          status={select('status', ['published', 'unpublished', 'edited', 'created'], 'edited')}
+          status={select(
+            'status',
+            ['published', 'unpublished', 'edited', 'created', 'truncated'],
+            'edited'
+          )}
           title={text('title', '23 may 2019')}
           users={users}
           isCurrentVersion={boolean('isCurrentVersion', false, 'props')}
