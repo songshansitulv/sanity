@@ -3,7 +3,6 @@ import React from 'react'
 import styles from './styles/EventIcon.module.css'
 
 function EventIcon({className, type}) {
-  console.log('EventIcon', type)
   switch (type) {
     case 'created':
       return <div className={`${className} ${styles.created}`} aria-hidden="true" />
