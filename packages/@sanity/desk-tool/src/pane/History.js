@@ -128,11 +128,9 @@ export default class History extends React.PureComponent {
       selectedRev,
       errorMessage,
       loadingError,
-      currentIndex,
       loading,
       headerShadowOpacity
     } = this.state
-
     return (
       <div className={styles.root}>
         <div
