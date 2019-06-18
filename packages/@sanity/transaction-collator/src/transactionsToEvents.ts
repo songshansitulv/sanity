@@ -3,6 +3,7 @@ import {EventType, HistoryEvent, Transaction, Mutation} from './types'
 import {ndjsonToArray} from './utils/ndjsonToArray'
 
 const EDIT_EVENT_TIME_TRESHHOLD_MS = 5 * 1000 * 60 * 5 // 5 minutes
+
 export function transactionsToEvents(
   documentIds: string[],
   transactions: string | Buffer | Transaction[]
@@ -106,6 +107,12 @@ export function mutationsToEventTypeAndDocumentId(mutations: Mutation[], transac
     }
   }
 
+  // (re) created
+  if (transactionIndex > 0 && mutations.length === 1 && createIfNotExistsPatch) {
+    const type = createIfNotExistsPatch._id.startsWith('.draft') ? 'edited' : 'published'
+    return {type, documentId: createIfNotExistsPatch._id}
+  }
+
   // Published
   if ((createOrReplacePatch || createPatch || createIfNotExistsPatch) && deletePatch && deletePatch.id.startsWith('drafts.')) {
     return {
@@ -149,11 +156,19 @@ export function mutationsToEventTypeAndDocumentId(mutations: Mutation[], transac
     return {type: 'truncated', documentId: squashedPatch._id}
   }
 
+  // Deleted
+  if (mutations.every(mut => mut.delete !== undefined)) {
+    return {type: 'deleted', documentId: undefined}
+  }
+
   // Edited
   const patchedMutation = mutations.find(mut => mut.patch !== undefined)
   if (patchedMutation && patchedMutation.patch) {
     return {type: 'edited', documentId: patchedMutation.patch.id}
   }
+
+  // Unknown!
+  console.log(mutations)
   return {type: 'unknown', documentId: undefined}
 }
 

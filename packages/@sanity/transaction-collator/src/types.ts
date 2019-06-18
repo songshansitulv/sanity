@@ -7,7 +7,7 @@ export type Mutation = {
   patch?: {id: string}
 }
 
-export type EventType = 'created' | 'edited' | 'published' | 'unpublished' | 'discardDraft' | 'truncated' | 'unknown'
+export type EventType = 'created' | 'edited' | 'published' | 'unpublished' | 'discardDraft' | 'truncated' | 'deleted' | 'unknown'
 
 export type HistoryEvent = {
   displayDocumentId?: string
