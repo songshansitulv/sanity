@@ -25,7 +25,7 @@ export default class Actions extends React.PureComponent {
     showSavingStatus: PropTypes.bool.isRequired,
     showValidationTooltip: PropTypes.bool.isRequired,
     type: PropTypes.object.isRequired,
-    value: PropTypes.object.isRequired
+    value: PropTypes.object
   }
   // eslint-disable-next-line class-methods-use-this
   renderSavingStatus() {
