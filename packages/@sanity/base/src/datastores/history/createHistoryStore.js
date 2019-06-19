@@ -4,7 +4,7 @@ import {transactionsToEvents} from '@sanity/transaction-collator'
 import {map, scan, reduce, mergeMap} from 'rxjs/operators'
 import {getDraftId, getPublishedId} from '../../util/draftUtils'
 
-const documentRevisionCache = {}
+const documentRevisionCache = Object.create(null)
 
 const compileTransactions = (acc, curr) => {
   if (acc[curr.id]) {
@@ -46,16 +46,14 @@ const getHistory = (documentIds, options = {}) => {
 }
 
 const getDocumentAtRevision = (documentId, revision) => {
-  const cacheKey = `${documentId}.${revision}`
-  if (documentRevisionCache[cacheKey]) {
-    return Promise.resolve(documentRevisionCache[cacheKey])
+  const cacheKey = `${documentId}@${revision}`
+  if (!(cacheKey in documentRevisionCache)) {
+    const dataset = client.clientConfig.dataset
+    const url = `/data/history/${dataset}/documents/${documentId}?revision=${revision}`
+    documentRevisionCache[cacheKey] = client.request({url}).then(result => result.documents[0])
   }
-  const dataset = client.clientConfig.dataset
-  const url = `/data/history/${dataset}/documents/${documentId}?revision=${revision}`
-  return client.request({url}).then(result => {
-    documentRevisionCache[cacheKey] = result.documents[0]
-    return documentRevisionCache[cacheKey]
-  })
+
+  return documentRevisionCache[cacheKey]
 }
 
 const getTransactions = documentIds => {
