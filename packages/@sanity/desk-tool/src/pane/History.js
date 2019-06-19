@@ -9,6 +9,8 @@ import HistoryItem from './HistoryItem'
 
 import styles from './styles/History.css'
 
+const maybe = (val, fn) => val && fn(val)
+
 export default class History extends React.PureComponent {
   static propTypes = {
     onClose: PropTypes.func,
@@ -80,8 +82,8 @@ export default class History extends React.PureComponent {
                 onClick={() => onItemSelect(events[i])}
                 isSelected={event.rev === selectedRev}
                 isCurrentVersion={i === 0}
-                onSelectPrev={() => onItemSelect(events[i - 1])}
-                onSelectNext={() => onItemSelect(events[i + 1])}
+                onSelectPrev={() => maybe(events[i - 1], onItemSelect)}
+                onSelectNext={() => maybe(events[i + 1], onItemSelect)}
               />
             ))}
         </div>
