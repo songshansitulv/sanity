@@ -34,7 +34,7 @@ export default class HistoryItem extends React.PureComponent {
 
   static propTypes = {
     displayDocumentId: PropTypes.string,
-    endTime: PropTypes.instanceOf(Date).isRequired,
+    endTime: PropTypes.string.isRequired,
     isCurrentVersion: PropTypes.bool.isRequired,
     isSelected: PropTypes.bool,
     onClick: PropTypes.func.isRequired,

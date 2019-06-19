@@ -16,7 +16,7 @@ export default class History extends React.PureComponent {
     onClose: PropTypes.func,
     documentId: PropTypes.string,
     onItemSelect: PropTypes.func,
-    lastEdited: PropTypes.string,
+    lastEdited: PropTypes.object,
     errorMessage: PropTypes.string,
     selectedEvent: PropTypes.object
   }
