@@ -390,19 +390,17 @@ export default withRouterHOC(
 
     handleConfirmHistoryRestore = () => {
       const {onRestore} = this.props
-      const {historyState} = this.state
-      const event = historyState.events.find(e => e.rev === historyState.selectedRev)
-      if (event) {
-        HistoryStore.getDocumentAtRevision(event.displayDocumentId, event.rev).then(document => {
-          delete document._rev
-          delete document._id
-          delete document._updatedAt
-          onRestore(document)
-          this.setHistoryState({
-            selected: null
-          })
-          this.setState({showConfirmHistoryRestore: false})
-        })
+      const selectedEvent = this.findSelectedEvent()
+      if (selectedEvent) {
+        HistoryStore.getDocumentAtRevision(selectedEvent.displayDocumentId, selectedEvent.rev).then(
+          document => {
+            onRestore(document)
+            this.setHistoryState({
+              selected: null
+            })
+            this.setState({showConfirmHistoryRestore: false})
+          }
+        )
       }
     }
 
@@ -562,15 +560,22 @@ export default withRouterHOC(
       )
     }
 
+    findSelectedEvent() {
+      const {events, selectedRev} = this.state.historyState
+      return events.find(
+        event => event.rev === selectedRev || event.transactionIds.includes(selectedRev)
+      )
+    }
+
     renderHistoryInfo = () => {
       const {isReconnecting} = this.props
       const {historyState} = this.state
-      const disableFistEvent =
-        historyState.isOpen &&
-        historyState.events.find(e => e.rev === historyState.selectedRev) === historyState.events[0]
+      const selectedEvent = this.findSelectedEvent()
+
+      const isLatestEvent = historyState.events[0] === selectedEvent
       return (
         <RestoreHistoryButton
-          disabled={isReconnecting || !historyState.isOpen || disableFistEvent}
+          disabled={isReconnecting || !historyState.isOpen || isLatestEvent}
           onRestore={this.handleConfirmHistoryRestore}
         />
       )
@@ -632,7 +637,8 @@ export default withRouterHOC(
     renderForm() {
       const {type, markers, draft, published, patchChannel} = this.props
       const {historyState, focusPath, filterField, isReconnecting} = this.state
-      const selectedEvent = historyState.events.find(e => e.rev === historyState.selectedRev)
+      const selectedEvent = this.findSelectedEvent()
+
       return historyState.isOpen && !historyState.isLoading && selectedEvent ? (
         <HistoryForm
           isLatest={selectedEvent === historyState.events[0]}
@@ -719,7 +725,7 @@ export default withRouterHOC(
                 events={historyState.events}
                 isLoading={historyState.isLoading}
                 error={historyState.error}
-                selectedRev={historyState.selectedRev}
+                selectedEvent={this.findSelectedEvent()}
               />
             </div>
           )}

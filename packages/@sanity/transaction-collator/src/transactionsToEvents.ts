@@ -43,6 +43,7 @@ function mapToEvents(
     displayDocumentId: documentId,
     rev: transaction.id,
     userIds,
+    transactionIds: [transaction.id],
     startTime: timestamp,
     endTime: timestamp
   }
@@ -65,6 +66,8 @@ function reduceEdits(
   if (skipEvent) {
     // Lift authors over to next event
     nextEvent.userIds = uniq(nextEvent.userIds.concat(current.userIds))
+    // Lift list of transactions over to next event
+    nextEvent.transactionIds = uniq(current.transactionIds.concat(nextEvent.transactionIds))
     // Set startTime on next event to be this one if not done already
     // (then startTime and endTime would be different)
     if (current.startTime === current.endTime) {

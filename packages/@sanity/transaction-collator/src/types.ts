@@ -15,6 +15,7 @@ export type HistoryEvent = {
   endTime: string,
   rev: string
   startTime: string
+  transactionIds: string[]
   type: EventType
   userIds: string[]
 }

@@ -16,9 +16,9 @@ export default class History extends React.PureComponent {
     onClose: PropTypes.func,
     documentId: PropTypes.string,
     onItemSelect: PropTypes.func,
-    lastEdited: PropTypes.object,
+    lastEdited: PropTypes.string,
     errorMessage: PropTypes.string,
-    selectedRev: PropTypes.string
+    selectedEvent: PropTypes.object
   }
 
   state = {
@@ -53,7 +53,7 @@ export default class History extends React.PureComponent {
   }
 
   render() {
-    const {onClose, events, onItemSelect, selectedRev, isLoading, error} = this.props
+    const {onClose, events, onItemSelect, selectedEvent, isLoading, error} = this.props
     const {headerShadowOpacity} = this.state
     return (
       <div className={styles.root}>
@@ -80,7 +80,7 @@ export default class History extends React.PureComponent {
                 {...event}
                 key={event.rev}
                 onClick={() => onItemSelect(events[i])}
-                isSelected={event.rev === selectedRev}
+                isSelected={event === selectedEvent}
                 isCurrentVersion={i === 0}
                 onSelectPrev={() => maybe(events[i - 1], onItemSelect)}
                 onSelectNext={() => maybe(events[i + 1], onItemSelect)}
