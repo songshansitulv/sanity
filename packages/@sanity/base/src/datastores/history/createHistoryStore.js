@@ -3,6 +3,8 @@ import {from, merge} from 'rxjs'
 import {transactionsToEvents} from '@sanity/transaction-collator'
 import {map, scan, reduce, mergeMap} from 'rxjs/operators'
 
+const documentRevisionCache = {}
+
 const compileTransactions = (acc, curr) => {
   if (acc[curr.id]) {
     acc[curr.id].mutations = acc[curr.id].mutations.concat(curr.mutations)
@@ -40,6 +42,19 @@ const getHistory = (documentIds, options = {}) => {
   }
 
   return client.request({url})
+}
+
+const getDocumentAtRevision = (documentId, revision) => {
+  const cacheKey = `${documentId}.${revision}`
+  if (documentRevisionCache[cacheKey]) {
+    return Promise.resolve(documentRevisionCache[cacheKey])
+  }
+  const dataset = client.clientConfig.dataset
+  const url = `/data/history/${dataset}/documents/${documentId}?revision=${revision}`
+  return client.request({url}).then(result => {
+    documentRevisionCache[cacheKey] = result.documents[0]
+    return documentRevisionCache[cacheKey]
+  })
 }
 
 const getTransactions = documentIds => {
@@ -81,10 +96,18 @@ const eventStreamer$ = documentIds => {
       return {...prev, ...next}
     }, {}),
     map(transactions =>
-      transactionsToEvents(
-        documentIds,
-        Object.keys(transactions).map(key => transactions[key])
-      ).reverse()
+      transactionsToEvents(documentIds, Object.keys(transactions).map(key => transactions[key]))
+        .reverse()
+        .map(event => {
+          event.getDocumentAtRevision = () => {
+            // We don't really have anything to show, it's gone, so return null
+            if (event.displayDocumentId === null) {
+              return Promise.resolve(null)
+            }
+            return getDocumentAtRevision(event.displayDocumentId, event.rev)
+          }
+          return event
+        })
     )
   )
 }
