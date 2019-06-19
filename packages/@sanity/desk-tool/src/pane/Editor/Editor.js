@@ -64,11 +64,11 @@ const getUnpublishItem = (draft, published, isLiveEditEnabled) =>
   isLiveEditEnabled
     ? null
     : {
-      action: 'unpublish',
-      title: 'Unpublish…',
-      icon: VisibilityOffIcon,
-      isDisabled: !published
-    }
+        action: 'unpublish',
+        title: 'Unpublish…',
+        icon: VisibilityOffIcon,
+        isDisabled: !published
+      }
 
 const getDeleteItem = (draft, published) => ({
   group: 'danger',
@@ -83,11 +83,11 @@ const getHistoryMenuItem = (draft, published, isLiveEditEnabled) =>
   isLiveEditEnabled
     ? null
     : {
-      action: 'browseHistory',
-      title: 'Browse history',
-      icon: HistoryIcon,
-      isDisabled: !(draft || published)
-    }
+        action: 'browseHistory',
+        title: 'Browse history',
+        icon: HistoryIcon,
+        isDisabled: !(draft || published)
+      }
 
 const getInspectItem = (draft, published) => ({
   action: 'inspect',
@@ -114,7 +114,7 @@ const getProductionPreviewItem = (draft, published) => {
   } catch (error) {
     error.message = `An error was thrown while trying to get production preview url: ${
       error.message
-      }`
+    }`
     // eslint-disable-next-line no-console
     console.error(error)
     return null
@@ -632,20 +632,15 @@ export default withRouterHOC(
     renderForm() {
       const {type, markers, draft, published, patchChannel} = this.props
       const {historyState, focusPath, filterField, isReconnecting} = this.state
-      if (historyState.isOpen) {
-        const selectedEvent = historyState.events.find(e => e.rev === historyState.selectedRev)
-        return historyState.isLoading || !selectedEvent ? (
-          'Loading…'
-        ) : (
-          <HistoryForm
-            isLatest={selectedEvent === historyState.events[0]}
-            event={selectedEvent}
-            schema={schema}
-            type={type}
-          />
-        )
-      }
-      return (
+      const selectedEvent = historyState.events.find(e => e.rev === historyState.selectedRev)
+      return historyState.isOpen && !historyState.isLoading && selectedEvent ? (
+        <HistoryForm
+          isLatest={selectedEvent === historyState.events[0]}
+          event={selectedEvent}
+          schema={schema}
+          type={type}
+        />
+      ) : (
         <EditForm
           draft={draft}
           filterField={filterField}

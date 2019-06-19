@@ -4,8 +4,24 @@ import FormBuilder from 'part:@sanity/form-builder'
 import HistoryStore from 'part:@sanity/base/datastore/history'
 import TimeAgo from '../../components/TimeAgo'
 import styles from '../styles/Editor.css'
+import {format, isToday, isYesterday} from 'date-fns'
+
+import Spinner from 'part:@sanity/components/loading/spinner'
+import Delay from '../../utils/Delay'
 
 const noop = () => null
+
+const dateFormat = 'MMM D, YYYY, hh:mm A'
+
+export function getDateString(date) {
+  if (isToday(date)) {
+    return `Today, ${format(date, 'hh:mm A')}`
+  }
+  if (isYesterday(date)) {
+    return `Yesterday, ${format(date, 'hh:mm A')}`
+  }
+  return format(date, dateFormat)
+}
 
 export default class HistoryForm extends React.PureComponent {
   static propTypes = {
@@ -47,19 +63,25 @@ export default class HistoryForm extends React.PureComponent {
     const {isLoading, document} = this.state
     return (
       <>
-        {isLoading && 'Loading…'}
+        {isLoading && (
+          <Delay ms={600}>
+            <div className={styles.spinnerContainer}>
+              <Spinner center message={`Loading revision from ${getDateString(event.endTime)}…`} />
+            </div>
+          </Delay>
+        )}
         <div className={styles.top}>
           {document && (
             <span className={styles.editedTime}>
               {'Changed '}
-              <TimeAgo time={event.endTime.toISOString()} />
+              <TimeAgo time={event.endTime} />
               {isLatest && <span> - Latest version</span>}
             </span>
           )}
         </div>
 
         <form className={styles.editor} id="Sanity_Default_DeskTool_Editor_ScrollContainer">
-          {!document && <p>There is no data associated with this history event.</p>}
+          {!isLoading && !document && <p>There is no data associated with this history event.</p>}
           {document && (
             <FormBuilder
               onBlur={noop}

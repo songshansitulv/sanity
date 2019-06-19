@@ -1,7 +1,7 @@
 import client from 'part:@sanity/base/client'
 import {from, merge} from 'rxjs'
 import {transactionsToEvents} from '@sanity/transaction-collator'
-import {map, scan, reduce, mergeMap} from 'rxjs/operators'
+import {map, mergeMap, reduce, scan} from 'rxjs/operators'
 import {getDraftId, getPublishedId} from '../../util/draftUtils'
 
 const documentRevisionCache = Object.create(null)
@@ -63,15 +63,16 @@ const getTransactions = documentIds => {
   return client.request({url}).then(ndjsonToArray)
 }
 
-const eventStreamer$ = documentIds => {
-  const query = '*[_id in $documentIds]'
-  const params = {documentIds: documentIds}
+function historyEventsFor(documentId) {
+  const pairs = [getDraftId(documentId), getPublishedId(documentId)]
 
-  const pastTransactions$ = from(getTransactions(documentIds)).pipe(
+  const query = '*[_id in $documentIds]'
+
+  const pastTransactions$ = from(getTransactions(pairs)).pipe(
     mergeMap(transactions => from(transactions)),
     map(trans => ({
       author: trans.author,
-      documentIDs: documentIds,
+      documentIDs: pairs,
       id: trans.id,
       mutations: trans.mutations,
       timestamp: trans.timestamp
@@ -79,10 +80,10 @@ const eventStreamer$ = documentIds => {
     reduce(compileTransactions, {})
   )
 
-  const realtimeTransactions$ = client.observable.listen(query, params).pipe(
+  const realtimeTransactions$ = client.observable.listen(query, {documentIds: pairs}).pipe(
     map(item => ({
       author: item.identity,
-      documentIDs: documentIds,
+      documentIDs: pairs,
       id: item.transactionId,
       mutations: item.mutations,
       timestamp: item.timestamp
@@ -95,16 +96,9 @@ const eventStreamer$ = documentIds => {
       return {...prev, ...next}
     }, {}),
     map(transactions =>
-      transactionsToEvents(
-        documentIds,
-        Object.keys(transactions).map(key => transactions[key])
-      ).reverse()
+      transactionsToEvents(pairs, Object.keys(transactions).map(key => transactions[key])).reverse()
     )
   )
-}
-
-function historyEventsFor(documentId) {
-  return eventStreamer$([getDraftId(documentId), getPublishedId(documentId)])
 }
 
 export default function createHistoryStore() {

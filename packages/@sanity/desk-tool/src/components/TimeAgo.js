@@ -12,17 +12,17 @@ import {
   differenceInYears
 } from 'date-fns'
 
-function dateFormat(d) {
+export function formatTimeAgo(date) {
   const now = Date.now()
-  const diffSeconds = differenceInSeconds(now, d)
-  const diffMins = differenceInMinutes(now, d)
-  const diffHours = differenceInHours(now, d)
-  const diffDays = differenceInDays(now, d)
-  const diffWeeks = differenceInWeeks(now, d)
-  const diffMonths = differenceInMonths(now, d)
-  const diffYears = differenceInYears(now, d)
+  const diffSeconds = differenceInSeconds(now, date)
+  const diffMins = differenceInMinutes(now, date)
+  const diffHours = differenceInHours(now, date)
+  const diffDays = differenceInDays(now, date)
+  const diffWeeks = differenceInWeeks(now, date)
+  const diffMonths = differenceInMonths(now, date)
+  const diffYears = differenceInYears(now, date)
 
-  if (diffMonths || diffYears) return format(d, 'MMM D, YYYY, hh:mm A')
+  if (diffMonths || diffYears) return format(date, 'MMM D, YYYY, hh:mm A')
   if (diffWeeks) return `${diffWeeks}w ago`
   if (diffDays === 1) return 'yesterday'
   if (diffDays) return `${diffDays}d ago`
@@ -73,6 +73,6 @@ export default class TimeAgo extends React.PureComponent {
 
   render() {
     const timestamp = format(this.props.time, 'MMM D, YYYY, h:mm A Z')
-    return <span title={timestamp}>{dateFormat(this.props.time)}</span>
+    return <span title={timestamp}>{formatTimeAgo(this.props.time)}</span>
   }
 }

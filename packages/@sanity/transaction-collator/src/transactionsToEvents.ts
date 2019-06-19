@@ -35,7 +35,7 @@ function mapToEvents(
   index: number = 0
 ): HistoryEvent {
   const {type, documentId} = mutationsToEventTypeAndDocumentId(transaction.mutations, index)
-  const timestamp = new Date(transaction.timestamp)
+  const timestamp = transaction.timestamp
   const userIds = findUserIds(transaction, type)
   return {
     type,
@@ -59,14 +59,15 @@ function reduceEdits(
     current.type === 'edited' &&
     nextEvent &&
     nextEvent.type === 'edited' &&
-    nextEvent.endTime.getTime() - current.endTime.getTime() < EDIT_EVENT_TIME_TRESHHOLD_MS &&
+    new Date(nextEvent.endTime).getTime() - new Date(current.endTime).getTime() <
+      EDIT_EVENT_TIME_TRESHHOLD_MS &&
     isEqual(current.documentIDs, nextEvent.documentIDs)
   if (skipEvent) {
     // Lift authors over to next event
     nextEvent.userIds = uniq(nextEvent.userIds.concat(current.userIds))
     // Set startTime on next event to be this one if not done already
     // (then startTime and endTime would be different)
-    if (current.startTime.getTime() === current.endTime.getTime()) {
+    if (current.startTime === current.endTime) {
       nextEvent.startTime = current.startTime
     }
   } else {

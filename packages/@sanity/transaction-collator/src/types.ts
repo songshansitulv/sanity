@@ -12,9 +12,9 @@ export type EventType = 'created' | 'edited' | 'published' | 'unpublished' | 'di
 export type HistoryEvent = {
   displayDocumentId: string | null
   documentIDs: string[]
-  endTime: Date,
+  endTime: string,
   rev: string
-  startTime: Date
+  startTime: string
   type: EventType
   userIds: string[]
 }
