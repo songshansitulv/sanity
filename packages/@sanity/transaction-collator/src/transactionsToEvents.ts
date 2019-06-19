@@ -167,7 +167,7 @@ export function mutationsToEventTypeAndDocumentId(
 
   // Deleted
   if (mutations.every(mut => mut.delete !== undefined)) {
-    return {type: 'deleted', documentId: undefined}
+    return {type: 'deleted', documentId: null}
   }
 
   // Edited
