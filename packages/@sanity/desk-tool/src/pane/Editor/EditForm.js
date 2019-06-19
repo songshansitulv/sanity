@@ -46,7 +46,7 @@ export default class EditForm extends React.PureComponent {
       schema,
       type
     } = this.props
-    const value = draft || published
+    const value = draft || published || {_type: type}
     return (
       <>
         <div className={styles.top}>
