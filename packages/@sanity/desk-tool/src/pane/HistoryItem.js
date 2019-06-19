@@ -64,8 +64,9 @@ export default class HistoryItem extends React.PureComponent {
   }
 
   handleKeyUp = event => {
+    const {onClick} = this.props
     if (event.key === 'Enter') {
-      this.handleClick()
+      onClick()
     }
   }
 
