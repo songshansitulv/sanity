@@ -462,8 +462,12 @@ export default withRouterHOC(
 
     getTitle(value) {
       const {title: paneTitle, type} = this.props
+      const {historyState} = this.state
       if (paneTitle) {
         return <span>{paneTitle}</span>
+      }
+      if (historyState.isOpen) {
+        return `History of ${value.title}`
       }
       if (!value) {
         return `Creating new ${type.title || type.name}`
