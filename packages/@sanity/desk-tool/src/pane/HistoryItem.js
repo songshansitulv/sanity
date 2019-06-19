@@ -28,7 +28,8 @@ function getHumanReadableStatus(type) {
 export default class HistoryItem extends React.PureComponent {
   static defaultProps = {
     displayDocumentId: undefined,
-    isSelected: false
+    isSelected: false,
+    userIds: undefined
   }
 
   static propTypes = {
@@ -49,7 +50,7 @@ export default class HistoryItem extends React.PureComponent {
       'truncated',
       'unknown'
     ]).isRequired,
-    userIds: PropTypes.arrayOf(PropTypes.string).isRequired
+    userIds: PropTypes.arrayOf(PropTypes.string)
   }
 
   componentDidMount() {
