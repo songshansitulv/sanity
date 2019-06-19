@@ -14,7 +14,7 @@ export default class HistoryForm extends React.PureComponent {
     event: PropTypes.shape({
       displayDocumentId: PropTypes.string,
       rev: PropTypes.string,
-      endTime: PropTypes.string
+      endTime: PropTypes.object
     }),
     isLatest: PropTypes.bool
   }
