@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import FormBuilder from 'part:@sanity/form-builder'
 import {format, isYesterday, isToday} from 'date-fns'
+import TimeAgo from '../../components/TimeAgo'
 import styles from '../styles/Editor.css'
 
 const dateFormat = 'MMM D, YYYY, hh:mm A'
@@ -26,30 +27,34 @@ export default class HistoryForm extends React.PureComponent {
     timestamp: PropTypes.object.isRequired,
     isLatest: PropTypes.bool.isRequired
   }
-  renderDescription() {
-    const {isLatest, timestamp} = this.props
-    if (isLatest) {
-      return <p>This is the current version</p>
-    }
-    return <p>Showing historic version of the document from {getDateString(timestamp)}</p>
-  }
   render() {
-    const {schema, type, value} = this.props
+    const {schema, type, value, timestamp, isLatest} = this.props
     return (
-      <form className={styles.editor} id="Sanity_Default_DeskTool_Editor_ScrollContainer">
-        {value && this.renderDescription()}
-        {!value && <p>There is no data associated with this history event.</p>}
-        {value && (
-          <FormBuilder
-            onBlur={noop}
-            onFocus={noop}
-            readOnly
-            schema={schema}
-            type={type}
-            value={value}
-          />
-        )}
-      </form>
+      <>
+        <div className={styles.top}>
+          {value && (
+            <span className={styles.editedTime}>
+              {'Changed '}
+              <TimeAgo time={timestamp.toISOString()} />
+              {isLatest && <span> - Latest version</span>}
+            </span>
+          )}
+        </div>
+
+        <form className={styles.editor} id="Sanity_Default_DeskTool_Editor_ScrollContainer">
+          {!value && <p>There is no data associated with this history event.</p>}
+          {value && (
+            <FormBuilder
+              onBlur={noop}
+              onFocus={noop}
+              readOnly
+              schema={schema}
+              type={type}
+              value={value}
+            />
+          )}
+        </form>
+      </>
     )
   }
 }
