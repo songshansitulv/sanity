@@ -77,48 +77,29 @@ export default class History extends React.PureComponent {
   }
 
   handleSelectEvent = (event, itemIndex) => {
-    const {onItemSelect, currentRev} = this.props
-    if (!event) {
-      return
-    }
-    const {rev, type, title, displayDocumentId} = event
-    if (!rev || !type || !displayDocumentId) {
-      return
-    }
+    const {onItemSelect} = this.props
+    const {rev, type} = event
     if (onItemSelect) {
-      if (currentRev === rev) {
-        this.setState({selectedRev: rev})
-        onItemSelect(event, itemIndex)
-      } else {
-        HistoryStore.getHistory(displayDocumentId, {revision: rev})
-          .then(res => {
-            const {documents} = res
-            if (documents && documents[0]) {
-              this.setState({selectedRev: rev})
-              onItemSelect(
-                {
-                  value: documents[0],
-                  status: type
-                },
-                itemIndex
-              )
-            } else {
-              // eslint-disable-next-line no-console
-              console.error(`Got no document for revision ${rev}`, res)
-              this.setState({errorMessage: `Sorry, we could not load history for ${title}`})
-            }
+      this.setState({selectedRev: rev})
+      event
+        .getDocumentAtRevision()
+        .then(document => {
+          onItemSelect(
+            {
+              value: document,
+              status: type
+            },
+            itemIndex
+          )
+        })
+        .catch(err => {
+          // eslint-disable-next-line no-console
+          console.error(`Could not fetch revision ${rev}`, err)
+          this.setState({
+            errorMessage: `Sorry, we could not load history for ${document._id} at rev ${event.rev}`
           })
-          .catch(res => {
-            // eslint-disable-next-line no-console
-            console.error(`Could not fetch revision ${rev}`, res)
-            this.setState({errorMessage: `Sorry, we could not load history for ${title}`})
-          })
-      }
+        })
     }
-  }
-
-  handleItemClick = props => {
-    this.handleSelectEvent(props)
   }
 
   render() {

@@ -7,51 +7,12 @@ export default class EditorStatusBadge extends React.PureComponent {
   static propTypes = {
     isDraft: PropTypes.bool,
     isPublished: PropTypes.bool,
-    onClick: PropTypes.func,
     title: PropTypes.string,
-    liveEdit: PropTypes.bool,
-    isPublishedRev: PropTypes.bool,
-    historyStatus: PropTypes.oneOf([
-      'published',
-      'edited',
-      'unpublished',
-      'created',
-      'discardDraft',
-      'truncated'
-    ])
+    liveEdit: PropTypes.bool
   }
 
   render() {
-    const {
-      isDraft,
-      isPublished,
-      onClick,
-      title,
-      liveEdit,
-      historyStatus,
-      isPublishedRev
-    } = this.props
-
-    if (historyStatus && historyStatus === 'published' && isPublishedRev) {
-      return (
-        <Badge inverted={!isPublishedRev} color="success">
-          {historyStatus}
-        </Badge>
-      )
-    }
-
-    if (historyStatus === 'unpublished') {
-      return (
-        <Badge inverted={!isPublishedRev} color="danger">
-          {historyStatus}
-        </Badge>
-      )
-    }
-
-    if (historyStatus) {
-      return null
-    }
-
+    const {isDraft, isPublished, title, liveEdit} = this.props
     return (
       <>
         {liveEdit ? (

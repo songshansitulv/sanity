@@ -1,19 +1,18 @@
 /* eslint-disable complexity, camelcase */
-import PropTypes from 'prop-types'
 // Connects the FormBuilder with various sanity roles
 import React from 'react'
+import PropTypes from 'prop-types'
 import {debounce} from 'lodash'
 import {Tooltip} from 'react-tippy'
 import {distanceInWordsToNow} from 'date-fns'
 import {withRouterHOC} from 'part:@sanity/base/router'
 import {PreviewFields} from 'part:@sanity/base/preview'
 import {getPublishedId, newDraftFrom} from 'part:@sanity/base/util/draft-utils'
-import {resolveEnabledActions, isActionEnabled} from 'part:@sanity/base/util/document-action-utils'
+import {isActionEnabled, resolveEnabledActions} from 'part:@sanity/base/util/document-action-utils'
 import Spinner from 'part:@sanity/components/loading/spinner'
 import Button from 'part:@sanity/components/buttons/default'
 import ButtonGrid from 'part:@sanity/components/buttons/button-grid'
 import PopOverDialog from 'part:@sanity/components/dialogs/popover'
-import FormBuilder from 'part:@sanity/form-builder'
 import TrashIcon from 'part:@sanity/base/trash-icon'
 import UndoIcon from 'part:@sanity/base/undo-icon'
 import PublicIcon from 'part:@sanity/base/public-icon'
@@ -24,34 +23,30 @@ import documentStore from 'part:@sanity/base/datastore/document'
 import schema from 'part:@sanity/base/schema'
 import Pane from 'part:@sanity/components/panes/default'
 import afterEditorComponents from 'all:part:@sanity/desk-tool/after-editor-component'
-import SyncIcon from 'part:@sanity/base/sync-icon'
-import CheckIcon from 'part:@sanity/base/check-icon'
 import CheckCircleIcon from 'part:@sanity/base/circle-check-icon'
 import HistoryIcon from 'part:@sanity/base/history-icon'
 import Snackbar from 'part:@sanity/components/snackbar/default'
 import resolveProductionPreviewUrl from 'part:@sanity/transitional/production-preview/resolve-production-url?'
-import ValidationList from 'part:@sanity/components/validation/list'
-import ChevronDown from 'part:@sanity/base/chevron-down-icon'
 import WarningIcon from 'part:@sanity/base/warning-icon'
-import LanguageFilter from 'part:@sanity/desk-tool/language-select-component?'
 import filterFieldFn$ from 'part:@sanity/desk-tool/filter-fields-fn?'
 import Hotkeys from 'part:@sanity/components/typography/hotkeys'
-import copyDocument from '../utils/copyDocument'
-import ConfirmUnpublish from '../components/ConfirmUnpublish'
-// import ConfirmDiscard from '../components/ConfirmDiscard'
-import ConfirmDelete from '../components/ConfirmDelete'
-import InspectView from '../components/InspectView'
-import DocTitle from '../components/DocTitle'
-import TimeAgo from '../components/TimeAgo'
-import History from './History'
-import styles from './styles/Editor.css'
-import EditorStatusBadge from './EditorStatusBadge'
+import copyDocument from '../../utils/copyDocument'
+import ConfirmUnpublish from '../../components/ConfirmUnpublish'
+import ConfirmDelete from '../../components/ConfirmDelete'
+import InspectView from '../../components/InspectView'
+import DocTitle from '../../components/DocTitle'
+import TimeAgo from '../../components/TimeAgo'
+import History from '../History'
+import styles from '../styles/Editor.css'
+import EditorStatusBadge from '../EditorStatusBadge'
+import Actions from './Actions'
+import RestoreHistoryButton from './RestoreHistoryButton'
+import EditForm from './EditForm'
+import HistoryForm from './HistoryForm'
 
 function navigateUrl(url) {
   window.open(url)
 }
-
-const preventDefault = ev => ev.preventDefault()
 
 // Want a nicer api for listen/unlisten
 function listen(target, eventType, callback, useCapture = false) {
@@ -119,7 +114,9 @@ const getProductionPreviewItem = (draft, published) => {
   try {
     previewUrl = resolveProductionPreviewUrl(snapshot)
   } catch (error) {
-    error.message = `An error was thrown while trying to get production preview url: ${error.message}`
+    error.message = `An error was thrown while trying to get production preview url: ${
+      error.message
+    }`
     // eslint-disable-next-line no-console
     console.error(error)
     return null
@@ -167,9 +164,7 @@ const INITIAL_STATE = {
   showValidationTooltip: false,
   focusPath: [],
   showHistory: false,
-  historyValue: undefined,
-  historyStatus: undefined,
-  showConfirmHistoryRestore: false,
+  historyEvent: undefined,
   filterField: () => true
 }
 
@@ -403,18 +398,10 @@ export default withRouterHOC(
 
     handleConfirmHistoryRestore = () => {
       const {onRestore} = this.props
-      const {historyValue} = this.state
-      onRestore(historyValue)
+      const {historyEvent} = this.state
+      onRestore(historyEvent.value)
       this.setState({
-        showConfirmHistoryRestore: false,
-        historyValue: undefined,
-        historyStatus: undefined
-      })
-    }
-
-    handleCancelHistoryRestore = () => {
-      this.setState({
-        showConfirmHistoryRestore: false
+        historyEvent: undefined
       })
     }
 
@@ -502,102 +489,23 @@ export default withRouterHOC(
       )
     }
 
-    renderActions = (props, state) => {
+    renderActions = () => {
       const {draft, published, markers, type, isReconnecting} = this.props
-      const {showSavingStatus, showValidationTooltip} = this.state
-
-      const value = draft || published
-
-      const validation = markers.filter(marker => marker.type === 'validation')
-      const errors = validation.filter(marker => marker.level === 'error')
-      const warnings = validation.filter(marker => marker.level === 'warning')
-
+      const {handleFocus, showSavingStatus, showValidationTooltip} = this.state
       return (
-        <div className={styles.paneFunctions}>
-          {LanguageFilter && <LanguageFilter />}
-          {showSavingStatus && (
-            <Tooltip
-              className={styles.syncStatusSyncing}
-              arrow
-              theme="light"
-              size="small"
-              distance="0"
-              title="Syncing your content with the Sanity cloud"
-            >
-              <span className={styles.syncSpinnerContainer}>
-                <span className={styles.syncSpinner}>
-                  <SyncIcon />
-                </span>
-                &nbsp;Syncing…
-              </span>
-            </Tooltip>
-          )}
-          {isReconnecting && (
-            <Tooltip
-              className={styles.syncStatusReconnecting}
-              arrow
-              theme="light"
-              size="small"
-              distance="0"
-              title="Connection lost. Reconnecting…"
-            >
-              <span className={styles.syncSpinnerContainer}>
-                <span className={styles.syncSpinner}>
-                  <SyncIcon />
-                </span>
-                &nbsp;Reconnecting…
-              </span>
-            </Tooltip>
-          )}
-          {value && !showSavingStatus && !isReconnecting && (
-            <Tooltip
-              className={styles.syncStatusSynced}
-              arrow
-              theme="light"
-              size="small"
-              distance="0"
-              title="Synced with the Sanity cloud"
-            >
-              <CheckIcon /> Synced {this.isLiveEditEnabled() && ' (live)'}
-            </Tooltip>
-          )}
-          {(errors.length > 0 || warnings.length > 0) && (
-            <Tooltip
-              arrow
-              theme="light noPadding"
-              trigger="click"
-              position="bottom"
-              interactive
-              duration={100}
-              open={showValidationTooltip}
-              onRequestClose={this.handleCloseValidationResults}
-              html={
-                <ValidationList
-                  truncate
-                  markers={validation}
-                  showLink
-                  isOpen={showValidationTooltip}
-                  documentType={type}
-                  onClose={this.handleCloseValidationResults}
-                  onFocus={this.handleFocus}
-                />
-              }
-            >
-              <Button
-                color="danger"
-                bleed
-                icon={WarningIcon}
-                padding="small"
-                onClick={this.handleToggleValidationResults}
-              >
-                {errors.length}
-                <span style={{paddingLeft: '0.5em', display: 'flex'}}>
-                  <ChevronDown />
-                </span>
-              </Button>
-            </Tooltip>
-          )}
-        </div>
+        <Actions
+          handleFocus={handleFocus}
+          value={draft || published}
+          markers={markers}
+          type={type}
+          isLiveEditEnabled={this.isLiveEditEnabled()}
+          isReconnecting={isReconnecting}
+          showSavingStatus={showSavingStatus}
+          showValidationTooltip={showValidationTooltip}
+          onCloseValidationResults={this.handleCloseValidationResults}
+          onToggleValidationResults={this.handleToggleValidationResults}
+          onFocus={this.handleFocus}
+        />
       )
     }
 
@@ -629,7 +537,6 @@ export default withRouterHOC(
             theme="light"
             disabled={'ontouchstart' in document.documentElement}
             className={styles.publishButton}
-            //title={errors.length > 0 ? 'Fix errors before publishing' : 'Publish (Ctrl+Alt+P)'}
             html={this.renderPublishButtonTooltip(errors, published)}
           >
             <Button
@@ -653,88 +560,46 @@ export default withRouterHOC(
 
     renderHistoryInfo = () => {
       const {isReconnecting} = this.props
-      const {showConfirmHistoryRestore} = this.state
-
+      const {historyEvent} = this.state
+      const historyValue = historyEvent && historyEvent.value
       return (
-        <>
-          <div>
-            <Tooltip
-              arrow
-              theme="light"
-              disabled={'ontouchstart' in document.documentElement}
-              className={styles.publishButton}
-              html={<div>Restore to this version</div>}
-            >
-              <Button
-                disabled={isReconnecting}
-                onClick={this.handleShowHistoryRestore}
-                color="primary"
-              >
-                Restore
-              </Button>
-            </Tooltip>
-            <div className={styles.publishInfoUndoButton}>
-              {showConfirmHistoryRestore && (
-                <PopOverDialog
-                  onClickOutside={this.handleCancelHistoryRestore}
-                  useOverlay={false}
-                  hasAnimation
-                >
-                  <div>
-                    <div className={styles.popOverText}>
-                      <strong>Are you sure</strong> you want to restore this document?
-                    </div>
-                    <ButtonGrid>
-                      <Button kind="simple" onClick={this.handleCancelHistoryRestore}>
-                        Cancel
-                      </Button>
-                      <Button color="danger" onClick={this.handleConfirmHistoryRestore}>
-                        Restore
-                      </Button>
-                    </ButtonGrid>
-                  </div>
-                </PopOverDialog>
-              )}
-            </div>
-          </div>
-        </>
+        <RestoreHistoryButton
+          disabled={isReconnecting || !historyValue}
+          onRestore={this.handleHistoryRestore}
+        />
       )
     }
 
     handleToggleHistory = () => {
-      this.setState(prevState => ({
-        showHistory: !prevState.showHistory,
-        historyValue: prevState.showHistory ? null : prevState.historyValue,
-        historyStatus: prevState.showHistory ? null : prevState.showHistory
-      }))
+      this.setState(prevState => {
+        return {
+          showHistory: !prevState.showHistory,
+          historyEvent: prevState.showHistory ? undefined : prevState.historyEvent
+        }
+      })
     }
 
     handleCloseHistory = () => {
       this.setState({
         showHistory: false,
-        historyValue: null,
-        historyStatus: null
+        historyEvent: undefined
       })
-    }
-
-    handleTopClick = event => {
-      this.handleToggleHistory()
     }
 
     renderStaticContent = () => {
       const {draft} = this.props
-      const {historyValue} = this.state
+      const {historyEvent} = this.state
 
       return (
         <div
           className={
-            (draft || historyValue) && !this.isLiveEditEnabled()
+            (draft || historyEvent) && !this.isLiveEditEnabled()
               ? styles.publishInfo
               : styles.publishInfoHidden
           }
         >
-          {historyValue && this.renderHistoryInfo()}
-          {!historyValue && draft && this.renderPublishInfo()}
+          {historyEvent && this.renderHistoryInfo()}
+          {!historyEvent && draft && this.renderPublishInfo()}
         </div>
       )
     }
@@ -742,8 +607,7 @@ export default withRouterHOC(
     handleHistorySelect = (event, index) => {
       this.setState({
         historyItemIndex: index,
-        historyValue: index === 0 ? null : event.value,
-        historyStatus: index === 0 ? null : event.status || undefined
+        historyEvent: index === 0 ? null : event
       })
     }
 
@@ -757,30 +621,48 @@ export default withRouterHOC(
       return value._id
     }
 
+    renderForm() {
+      const {type, markers, draft, published, patchChannel} = this.props
+      const {historyEvent, focusPath, filterField, isReconnecting} = this.state
+      if (historyEvent) {
+        return <HistoryForm value={historyEvent.value} schema={schema} type={type} />
+      }
+      return (
+        <EditForm
+          filterField={filterField}
+          focusPath={focusPath}
+          markers={markers}
+          onBlur={this.handleBlur}
+          onChange={this.handleChange}
+          onFocus={this.handleFocus}
+          patchChannel={patchChannel}
+          readOnly={isReconnecting || !isActionEnabled(type, 'update')}
+          schema={schema}
+          type={type}
+          value={draft || published || {_type: type.name}}
+        />
+      )
+    }
+
     render() {
       const {
         draft,
-        markers,
         published,
         type,
         isLoading,
         isReconnecting,
-        patchChannel,
         transactionResult,
         onClearTransactionResult
       } = this.props
 
       const {
         inspect,
-        focusPath,
         showConfirmDelete,
         showConfirmUnpublish,
         didPublish,
-        filterField,
         showHistory,
-        historyValue,
-        historyItemIndex,
-        historyStatus
+        historyEvent,
+        historyItemIndex
       } = this.state
 
       const value = draft || published
@@ -807,7 +689,6 @@ export default withRouterHOC(
       }
 
       const enabledActions = resolveEnabledActions(type)
-
       return (
         <div className={showHistory ? styles.paneWrapperWithHistory : styles.paneWrapper}>
           {showHistory && (
@@ -821,14 +702,14 @@ export default withRouterHOC(
                 currentIndex={historyItemIndex}
                 published={published}
                 draft={draft}
-                historyValue={historyValue}
+                historyEvent={historyEvent}
               />
             </div>
           )}
           <Pane
             styles={this.props.paneStyles}
             index={this.props.index}
-            title={this.getTitle(historyValue || value)}
+            title={this.getTitle(value)}
             onAction={this.handleMenuAction}
             menuItems={getMenuItems(enabledActions, draft, published, this.isLiveEditEnabled())}
             renderActions={this.renderActions}
@@ -843,13 +724,8 @@ export default withRouterHOC(
                 <span className={styles.statusBadges}>
                   <EditorStatusBadge
                     liveEdit={this.isLiveEditEnabled()}
-                    onClick={this.isLiveEditEnabled() ? () => {} : this.handleToggleHistory}
-                    historyStatus={historyStatus || undefined}
                     isDraft={!!draft}
                     isPublished={!!published}
-                    isPublishedRev={
-                      published && historyValue && published._rev === historyValue._rev
-                    }
                     title={
                       published &&
                       `Published ${distanceInWordsToNow(published._updatedAt, {
@@ -870,31 +746,13 @@ export default withRouterHOC(
                     }
                   >
                     {'Updated '}
-                    <TimeAgo time={historyValue ? historyValue._updatedAt : value._updatedAt} />
+                    <TimeAgo time={value._updatedAt} />
                   </span>
                 )}
               </div>
-              <form
-                className={styles.editor}
-                onSubmit={preventDefault}
-                id="Sanity_Default_DeskTool_Editor_ScrollContainer"
-              >
-                <FormBuilder
-                  schema={schema}
-                  patchChannel={patchChannel}
-                  value={historyValue || draft || published || {_type: type.name}}
-                  type={type}
-                  filterField={filterField}
-                  readOnly={
-                    historyItemIndex > 0 || isReconnecting || !isActionEnabled(type, 'update')
-                  }
-                  onBlur={this.handleBlur}
-                  onFocus={this.handleFocus}
-                  focusPath={focusPath}
-                  onChange={this.handleChange}
-                  markers={markers}
-                />
-              </form>
+
+              {this.renderForm()}
+
               {afterEditorComponents.map((AfterEditorComponent, i) => (
                 <AfterEditorComponent key={i} documentId={published._id} />
               ))}
