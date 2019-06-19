@@ -237,7 +237,13 @@ export default withRouterHOC(
           return
         }
 
-        if (event.ctrlKey && event.code === 'KeyI' && event.altKey && !event.shiftKey) {
+        if (
+          !this.state.historyState.isOpen &&
+          event.ctrlKey &&
+          event.code === 'KeyI' &&
+          event.altKey &&
+          !event.shiftKey
+        ) {
           this.setState(prevState => ({inspect: !prevState.inspect}))
           return
         }
