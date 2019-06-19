@@ -4,7 +4,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {debounce} from 'lodash'
 import {Tooltip} from 'react-tippy'
-import {distanceInWordsToNow} from 'date-fns'
 import {withRouterHOC} from 'part:@sanity/base/router'
 import {PreviewFields} from 'part:@sanity/base/preview'
 import {getPublishedId, newDraftFrom} from 'part:@sanity/base/util/draft-utils'
@@ -35,10 +34,8 @@ import ConfirmUnpublish from '../../components/ConfirmUnpublish'
 import ConfirmDelete from '../../components/ConfirmDelete'
 import InspectView from '../../components/InspectView'
 import DocTitle from '../../components/DocTitle'
-import TimeAgo from '../../components/TimeAgo'
 import History from '../History'
 import styles from '../styles/Editor.css'
-import EditorStatusBadge from '../EditorStatusBadge'
 import Actions from './Actions'
 import RestoreHistoryButton from './RestoreHistoryButton'
 import EditForm from './EditForm'
@@ -460,8 +457,12 @@ export default withRouterHOC(
 
     getTitle(value) {
       const {title: paneTitle, type} = this.props
+      const {historyEvent} = this.state
       if (paneTitle) {
         return <span>{paneTitle}</span>
+      }
+      if (historyEvent) {
+        return historyEvent.value ? historyEvent.value.title : 'No data'
       }
       if (!value) {
         return `Creating new ${type.title || type.name}`
@@ -491,7 +492,10 @@ export default withRouterHOC(
 
     renderActions = () => {
       const {draft, published, markers, type, isReconnecting} = this.props
-      const {handleFocus, showSavingStatus, showValidationTooltip} = this.state
+      const {historyEvent, handleFocus, showSavingStatus, showValidationTooltip} = this.state
+      if (historyEvent) {
+        return null
+      }
       return (
         <Actions
           handleFocus={handleFocus}
@@ -560,11 +564,11 @@ export default withRouterHOC(
 
     renderHistoryInfo = () => {
       const {isReconnecting} = this.props
-      const {historyEvent} = this.state
+      const {historyEvent, historyItemIndex} = this.state
       const historyValue = historyEvent && historyEvent.value
       return (
         <RestoreHistoryButton
-          disabled={isReconnecting || !historyValue}
+          disabled={isReconnecting || !historyValue || historyItemIndex === 0}
           onRestore={this.handleHistoryRestore}
         />
       )
@@ -573,8 +577,7 @@ export default withRouterHOC(
     handleToggleHistory = () => {
       this.setState(prevState => {
         return {
-          showHistory: !prevState.showHistory,
-          historyEvent: prevState.showHistory ? undefined : prevState.historyEvent
+          showHistory: !prevState.showHistory
         }
       })
     }
@@ -607,7 +610,7 @@ export default withRouterHOC(
     handleHistorySelect = (event, index) => {
       this.setState({
         historyItemIndex: index,
-        historyEvent: index === 0 ? null : event
+        historyEvent: event
       })
     }
 
@@ -623,19 +626,31 @@ export default withRouterHOC(
 
     renderForm() {
       const {type, markers, draft, published, patchChannel} = this.props
-      const {historyEvent, focusPath, filterField, isReconnecting} = this.state
+      const {historyEvent, focusPath, filterField, isReconnecting, historyItemIndex} = this.state
       if (historyEvent) {
-        return <HistoryForm value={historyEvent.value} schema={schema} type={type} />
+        return (
+          <HistoryForm
+            value={historyEvent.value}
+            schema={schema}
+            type={type}
+            isLatest={historyItemIndex === 0}
+            timestamp={historyEvent.timestamp}
+          />
+        )
       }
       return (
         <EditForm
+          draft={draft}
           filterField={filterField}
           focusPath={focusPath}
+          isLiveEditEnabled={this.isLiveEditEnabled()}
           markers={markers}
           onBlur={this.handleBlur}
           onChange={this.handleChange}
           onFocus={this.handleFocus}
+          onShowHistory={this.handleToggleHistory}
           patchChannel={patchChannel}
+          published={published}
           readOnly={isReconnecting || !isActionEnabled(type, 'update')}
           schema={schema}
           type={type}
@@ -711,7 +726,11 @@ export default withRouterHOC(
             index={this.props.index}
             title={this.getTitle(value)}
             onAction={this.handleMenuAction}
-            menuItems={getMenuItems(enabledActions, draft, published, this.isLiveEditEnabled())}
+            menuItems={
+              historyEvent
+                ? []
+                : getMenuItems(enabledActions, draft, published, this.isLiveEditEnabled())
+            }
             renderActions={this.renderActions}
             onMenuToggle={this.handleMenuToggle}
             isSelected // last pane is always selected for now
@@ -720,37 +739,6 @@ export default withRouterHOC(
             minSize={showHistory && 1000}
           >
             <div className={styles.pane}>
-              <div className={styles.top}>
-                <span className={styles.statusBadges}>
-                  <EditorStatusBadge
-                    liveEdit={this.isLiveEditEnabled()}
-                    isDraft={!!draft}
-                    isPublished={!!published}
-                    title={
-                      published &&
-                      `Published ${distanceInWordsToNow(published._updatedAt, {
-                        addSuffix: true
-                      })}`
-                    }
-                  />
-                </span>
-                {value && (
-                  <span
-                    className={
-                      showHistory || this.isLiveEditEnabled()
-                        ? styles.editedTime
-                        : styles.editedTimeClickable
-                    }
-                    onClick={
-                      showHistory || this.isLiveEditEnabled() ? undefined : this.handleToggleHistory
-                    }
-                  >
-                    {'Updated '}
-                    <TimeAgo time={value._updatedAt} />
-                  </span>
-                )}
-              </div>
-
               {this.renderForm()}
 
               {afterEditorComponents.map((AfterEditorComponent, i) => (

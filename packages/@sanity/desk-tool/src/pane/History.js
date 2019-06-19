@@ -46,6 +46,7 @@ export default class History extends React.PureComponent {
       next: events => {
         if (this._isMounted) {
           this.setState({events, selectedRev: events[0].rev, loading: false})
+          this.handleSelectEvent(events[0], 0)
         }
       }
     })
@@ -78,7 +79,7 @@ export default class History extends React.PureComponent {
 
   handleSelectEvent = (event, itemIndex) => {
     const {onItemSelect} = this.props
-    const {rev, type} = event
+    const {rev, type, endTime} = event
     if (onItemSelect) {
       this.setState({selectedRev: rev})
       event
@@ -87,7 +88,8 @@ export default class History extends React.PureComponent {
           onItemSelect(
             {
               value: document,
-              status: type
+              status: type,
+              timestamp: endTime
             },
             itemIndex
           )
