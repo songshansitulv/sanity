@@ -10,8 +10,6 @@ import {getPublishedId, newDraftFrom} from 'part:@sanity/base/util/draft-utils'
 import {isActionEnabled, resolveEnabledActions} from 'part:@sanity/base/util/document-action-utils'
 import Spinner from 'part:@sanity/components/loading/spinner'
 import Button from 'part:@sanity/components/buttons/default'
-import ButtonGrid from 'part:@sanity/components/buttons/button-grid'
-import PopOverDialog from 'part:@sanity/components/dialogs/popover'
 import TrashIcon from 'part:@sanity/base/trash-icon'
 import UndoIcon from 'part:@sanity/base/undo-icon'
 import PublicIcon from 'part:@sanity/base/public-icon'
@@ -32,6 +30,7 @@ import Hotkeys from 'part:@sanity/components/typography/hotkeys'
 import copyDocument from '../../utils/copyDocument'
 import ConfirmUnpublish from '../../components/ConfirmUnpublish'
 import ConfirmDelete from '../../components/ConfirmDelete'
+import ConfirmDiscard from '../../components/ConfirmDiscard'
 import InspectView from '../../components/InspectView'
 import DocTitle from '../../components/DocTitle'
 import History from '../History'
@@ -675,6 +674,7 @@ export default withRouterHOC(
         inspect,
         showConfirmDelete,
         showConfirmUnpublish,
+        showConfirmDiscard,
         didPublish,
         showHistory,
         historyEvent,
@@ -761,6 +761,14 @@ export default withRouterHOC(
                   published={published}
                   onCancel={this.handleCancelUnpublish}
                   onConfirm={this.handleConfirmUnpublish}
+                />
+              )}
+              {showConfirmDiscard && (
+                <ConfirmDiscard
+                  draft={draft}
+                  published={published}
+                  onCancel={this.handleCancelDiscard}
+                  onConfirm={this.handleConfirmDiscard}
                 />
               )}
               {isReconnecting && (
