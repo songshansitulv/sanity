@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import {debounce} from 'lodash'
 import {Tooltip} from 'react-tippy'
 import {withRouterHOC} from 'part:@sanity/base/router'
-import {tap, map} from 'rxjs/operators'
 import {PreviewFields} from 'part:@sanity/base/preview'
 import {getPublishedId, newDraftFrom} from 'part:@sanity/base/util/draft-utils'
 import HistoryStore from 'part:@sanity/base/datastore/history'
@@ -13,7 +12,6 @@ import {isActionEnabled, resolveEnabledActions} from 'part:@sanity/base/util/doc
 import Spinner from 'part:@sanity/components/loading/spinner'
 import Button from 'part:@sanity/components/buttons/default'
 import TrashIcon from 'part:@sanity/base/trash-icon'
-import UndoIcon from 'part:@sanity/base/undo-icon'
 import PublicIcon from 'part:@sanity/base/public-icon'
 import VisibilityOffIcon from 'part:@sanity/base/visibility-off-icon'
 import BinaryIcon from 'part:@sanity/base/binary-icon'
@@ -41,6 +39,7 @@ import Actions from './Actions'
 import RestoreHistoryButton from './RestoreHistoryButton'
 import EditForm from './EditForm'
 import HistoryForm from './HistoryForm'
+import {map} from 'rxjs/operators'
 
 function navigateUrl(url) {
   window.open(url)
@@ -196,7 +195,6 @@ export default withRouterHOC(
       }).isRequired,
 
       onDelete: PropTypes.func,
-      onCreate: PropTypes.func,
       onChange: PropTypes.func,
       onPublish: PropTypes.func,
       onRestore: PropTypes.func,
@@ -211,8 +209,7 @@ export default withRouterHOC(
       isReconnecting: PropTypes.bool,
       isRestoring: PropTypes.bool,
       isLoading: PropTypes.bool,
-      isSaving: PropTypes.bool,
-      deletedSnapshot: PropTypes.object
+      isSaving: PropTypes.bool
     }
 
     static defaultProps = {
@@ -225,10 +222,8 @@ export default withRouterHOC(
       isReconnecting: false,
       isRestoring: false,
       isCreatingDraft: false,
-      deletedSnapshot: null,
       transactionResult: null,
       onDelete() {},
-      onCreate() {},
       onChange() {},
       onClearTransactionResult() {}
     }
@@ -395,11 +390,20 @@ export default withRouterHOC(
 
     handleConfirmHistoryRestore = () => {
       const {onRestore} = this.props
-      const {selected} = this.state.historyState
-      onRestore(selected.value)
-      this.setHistoryState({
-        selected: null
-      })
+      const {historyState} = this.state
+      const event = historyState.events.find(e => e.rev === historyState.selectedRev)
+      if (event) {
+        HistoryStore.getDocumentAtRevision(event.displayDocumentId, event.rev).then(document => {
+          delete document._rev
+          delete document._id
+          delete document._updatedAt
+          onRestore(document)
+          this.setHistoryState({
+            selected: null
+          })
+          this.setState({showConfirmHistoryRestore: false})
+        })
+      }
     }
 
     handleConfirmDelete = () => {
@@ -457,12 +461,8 @@ export default withRouterHOC(
 
     getTitle(value) {
       const {title: paneTitle, type} = this.props
-      const {historyEvent} = this.state
       if (paneTitle) {
         return <span>{paneTitle}</span>
-      }
-      if (historyEvent) {
-        return historyEvent.value ? historyEvent.value.title : 'No data'
       }
       if (!value) {
         return `Creating new ${type.title || type.name}`
@@ -492,8 +492,8 @@ export default withRouterHOC(
 
     renderActions = () => {
       const {draft, published, markers, type, isReconnecting} = this.props
-      const {historyEvent, handleFocus, showSavingStatus, showValidationTooltip} = this.state
-      if (historyEvent) {
+      const {historyState, handleFocus, showSavingStatus, showValidationTooltip} = this.state
+      if (historyState.isOpen) {
         return null
       }
       return (
@@ -564,12 +564,14 @@ export default withRouterHOC(
 
     renderHistoryInfo = () => {
       const {isReconnecting} = this.props
-      const {historyEvent, historyItemIndex} = this.state
-      const historyValue = historyEvent && historyEvent.value
+      const {historyState} = this.state
+      const disableFistEvent =
+        historyState.isOpen &&
+        historyState.events.find(e => e.rev === historyState.selectedRev) === historyState.events[0]
       return (
         <RestoreHistoryButton
-          disabled={isReconnecting || !historyValue || historyItemIndex === 0}
-          onRestore={this.handleHistoryRestore}
+          disabled={isReconnecting || !historyState.isOpen || disableFistEvent}
+          onRestore={this.handleConfirmHistoryRestore}
         />
       )
     }
@@ -607,18 +609,16 @@ export default withRouterHOC(
 
     renderStaticContent = () => {
       const {draft} = this.props
-      const {historyEvent} = this.state
-
       return (
         <div
           className={
-            (draft || historyEvent) && !this.isLiveEditEnabled()
+            (draft || this.state.historyState.isOpen) && !this.isLiveEditEnabled()
               ? styles.publishInfo
               : styles.publishInfoHidden
           }
         >
-          {historyEvent && this.renderHistoryInfo()}
-          {!historyEvent && draft && this.renderPublishInfo()}
+          {this.state.historyState.isOpen && this.renderHistoryInfo()}
+          {!this.state.historyState.isOpen && draft && this.renderPublishInfo()}
         </div>
       )
     }
@@ -634,7 +634,7 @@ export default withRouterHOC(
       const {historyState, focusPath, filterField, isReconnecting} = this.state
       if (historyState.isOpen) {
         const selectedEvent = historyState.events.find(e => e.rev === historyState.selectedRev)
-        return (historyState.isLoading || !selectedEvent) ? (
+        return historyState.isLoading || !selectedEvent ? (
           'Loading…'
         ) : (
           <HistoryForm
