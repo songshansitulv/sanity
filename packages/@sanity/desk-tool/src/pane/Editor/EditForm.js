@@ -46,7 +46,7 @@ export default class EditForm extends React.PureComponent {
       schema,
       type
     } = this.props
-    const value = draft || published || {_type: type}
+    const value = draft || published
     return (
       <>
         <div className={styles.top}>
@@ -81,7 +81,7 @@ export default class EditForm extends React.PureComponent {
           <FormBuilder
             schema={schema}
             patchChannel={patchChannel}
-            value={value}
+            value={value || {_type: type}}
             type={type}
             filterField={filterField}
             readOnly={readOnly}

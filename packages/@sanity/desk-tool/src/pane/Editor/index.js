@@ -85,7 +85,8 @@ const getHistoryMenuItem = (draft, published, isLiveEditEnabled) =>
     : {
         action: 'browseHistory',
         title: 'Browse history',
-        icon: HistoryIcon
+        icon: HistoryIcon,
+        isDisabled: !(draft || published)
       }
 
 const getInspectItem = (draft, published) => ({
