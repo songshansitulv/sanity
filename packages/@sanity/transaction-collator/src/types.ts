@@ -10,7 +10,7 @@ export type Mutation = {
 export type EventType = 'created' | 'edited' | 'published' | 'unpublished' | 'discardDraft' | 'truncated' | 'deleted' | 'restored' | 'unknown'
 
 export type HistoryEvent = {
-  displayDocumentId?: string
+  displayDocumentId: string | null
   documentIDs: string[]
   endTime: Date,
   rev: string

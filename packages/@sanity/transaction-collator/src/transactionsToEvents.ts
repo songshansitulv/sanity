@@ -75,7 +75,10 @@ function reduceEdits(
   return acc
 }
 
-export function mutationsToEventTypeAndDocumentId(mutations: Mutation[], transactionIndex: number): {type: EventType, documentId?: string} {
+export function mutationsToEventTypeAndDocumentId(
+  mutations: Mutation[],
+  transactionIndex: number
+): {type: EventType; documentId: string | null} {
   const withoutPatches = mutations.filter(mut => mut.patch === undefined)
   const createOrReplaceMutation = withoutPatches.find(mut => mut.createOrReplace !== undefined)
   const createOrReplacePatch = createOrReplaceMutation && createOrReplaceMutation.createOrReplace
@@ -116,10 +119,14 @@ export function mutationsToEventTypeAndDocumentId(mutations: Mutation[], transac
   }
 
   // Published
-  if ((createOrReplacePatch || createPatch || createIfNotExistsPatch) && deletePatch && deletePatch.id.startsWith('drafts.')) {
+  if (
+    (createOrReplacePatch || createPatch || createIfNotExistsPatch) &&
+    deletePatch &&
+    deletePatch.id.startsWith('drafts.')
+  ) {
     return {
       type: 'published',
-      documentId: createValue && createValue._id
+      documentId: (createValue && createValue._id) || null
     }
   }
 
@@ -132,25 +139,25 @@ export function mutationsToEventTypeAndDocumentId(mutations: Mutation[], transac
   ) {
     return {
       type: 'unpublished',
-      documentId: createValue && createValue._id
+      documentId: (createValue && createValue._id) || null
     }
   }
 
   // Restored to previous version
   if (
-    ((createOrReplacePatch && createOrReplacePatch._id.startsWith('drafts.')) ||
-      (createPatch && createPatch._id.startsWith('drafts.')) ||
-      (createIfNotExistsPatch && createIfNotExistsPatch._id.startsWith('drafts.')))
+    (createOrReplacePatch && createOrReplacePatch._id.startsWith('drafts.')) ||
+    (createPatch && createPatch._id.startsWith('drafts.')) ||
+    (createIfNotExistsPatch && createIfNotExistsPatch._id.startsWith('drafts.'))
   ) {
     return {
-      type: 'edited', // (return 'edited' for now, should be 'restored' in the future when we can tag transactions)
-      documentId: createValue && createValue._id
+      type: 'edited',
+      documentId: (createValue && createValue._id) || null
     }
   }
 
   // Discard drafted changes
   if (mutations.length === 1 && deletePatch && deletePatch.id.startsWith('drafts.')) {
-    return {type: 'discardDraft', documentId: undefined}
+    return {type: 'discardDraft', documentId: deletePatch.id.replace('drafts.', '')}
   }
 
   // Truncated history
@@ -169,8 +176,7 @@ export function mutationsToEventTypeAndDocumentId(mutations: Mutation[], transac
     return {type: 'edited', documentId: patchedMutation.patch.id}
   }
 
-  // Unknown!
-  return {type: 'unknown', documentId: undefined}
+  return {type: 'unknown', documentId: null}
 }
 
 function findUserIds(transaction: Transaction, type: EventType): string[] {
