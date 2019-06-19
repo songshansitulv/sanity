@@ -17,10 +17,6 @@
   cursor: default;
 }
 
-.root[data-faded="true"] {
-  opacity: 0.5;
-}
-
 .root + .root {
   margin-left: var(--extra-small-padding--em);
 }
@@ -71,25 +67,46 @@
   @nest &[data-color="success"] {
     border-color: var(--state-success-color--faded);
     color: var(--state-success-color--strong);
+
+    @nest &[data-faded="true"] {
+      color: var(--state-success-color--faded);
+    }
   }
 
   @nest &[data-color="info"] {
     border-color: var(--state-info-color--faded);
     color: var(--state-info-color--strong);
+
+    @nest &[data-faded="true"] {
+      color: var(--state-info-color--faded);
+    }
   }
 
   @nest &[data-color="warning"] {
     border-color: var(--state-warning-color--faded);
     color: var(--state-warning-color--strong);
+
+    @nest &[data-faded="true"] {
+      border-color: var(--state-warning-color--faded);
+    }
   }
 
   @nest &[data-color="danger"] {
     border-color: var(--state-danger-color--faded);
     color: var(--state-danger-color--strong);
+
+    @nest &[data-faded="true"] {
+      color: var(--state-danger-color--faded);
+    }
   }
 
   @nest &[data-color="neutral"] {
     border-color: var(--gray-light);
     color: var(--gray);
+
+    @nest &[data-faded="true"] {
+      border-color: var(--gray-light);
+      color: var(--gray-light);
+    }
   }
 }
