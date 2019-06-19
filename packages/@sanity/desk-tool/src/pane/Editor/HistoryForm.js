@@ -52,7 +52,7 @@ export default class HistoryForm extends React.PureComponent {
           {document && (
             <span className={styles.editedTime}>
               {'Changed '}
-              <TimeAgo time={event.endTime} />
+              <TimeAgo time={event.endTime.toISOString()} />
               {isLatest && <span> - Latest version</span>}
             </span>
           )}
