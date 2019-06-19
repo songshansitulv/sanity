@@ -2,6 +2,7 @@ import client from 'part:@sanity/base/client'
 import {from, merge} from 'rxjs'
 import {transactionsToEvents} from '@sanity/transaction-collator'
 import {map, scan, reduce, mergeMap} from 'rxjs/operators'
+import {getDraftId, getPublishedId} from '../../util/draftUtils'
 
 const documentRevisionCache = {}
 
@@ -96,26 +97,23 @@ const eventStreamer$ = documentIds => {
       return {...prev, ...next}
     }, {}),
     map(transactions =>
-      transactionsToEvents(documentIds, Object.keys(transactions).map(key => transactions[key]))
-        .reverse()
-        .map(event => {
-          event.getDocumentAtRevision = () => {
-            // We don't really have anything to show, it's gone, so return null
-            if (event.displayDocumentId === null) {
-              return Promise.resolve(null)
-            }
-            return getDocumentAtRevision(event.displayDocumentId, event.rev)
-          }
-          return event
-        })
+      transactionsToEvents(
+        documentIds,
+        Object.keys(transactions).map(key => transactions[key])
+      ).reverse()
     )
   )
 }
 
+function historyEventsFor(documentId) {
+  return eventStreamer$([getDraftId(documentId), getPublishedId(documentId)])
+}
+
 export default function createHistoryStore() {
   return {
+    getDocumentAtRevision,
     getHistory,
     getTransactions,
-    eventStreamer$
+    historyEventsFor
   }
 }

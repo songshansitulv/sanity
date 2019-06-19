@@ -5,8 +5,10 @@ import PropTypes from 'prop-types'
 import {debounce} from 'lodash'
 import {Tooltip} from 'react-tippy'
 import {withRouterHOC} from 'part:@sanity/base/router'
+import {tap, map} from 'rxjs/operators'
 import {PreviewFields} from 'part:@sanity/base/preview'
 import {getPublishedId, newDraftFrom} from 'part:@sanity/base/util/draft-utils'
+import HistoryStore from 'part:@sanity/base/datastore/history'
 import {isActionEnabled, resolveEnabledActions} from 'part:@sanity/base/util/document-action-utils'
 import Spinner from 'part:@sanity/components/loading/spinner'
 import Button from 'part:@sanity/components/buttons/default'
@@ -151,6 +153,14 @@ const getMenuItems = (enabledActions, draft, published, isLiveEditEnabled) =>
 
 const isValidationError = marker => marker.type === 'validation' && marker.level === 'error'
 
+const INITIAL_HISTORY_STATE = {
+  isOpen: false,
+  isLoading: true,
+  error: false,
+  events: [],
+  selectedRev: null
+}
+
 const INITIAL_STATE = {
   inspect: false,
   isMenuOpen: false,
@@ -160,8 +170,7 @@ const INITIAL_STATE = {
   showConfirmUnpublish: false,
   showValidationTooltip: false,
   focusPath: [],
-  showHistory: false,
-  historyEvent: undefined,
+  historyState: INITIAL_HISTORY_STATE,
   filterField: () => true
 }
 
@@ -343,18 +352,9 @@ export default withRouterHOC(
       onChange(changeEvent)
     }
 
-    handleRestore = () => {
-      const {deletedSnapshot} = this.props
-      this.props.onCreate(deletedSnapshot)
-    }
-
     handleMenuToggle = evt => {
       evt.stopPropagation()
       this.setState(prevState => ({isMenuOpen: !prevState.isMenuOpen}))
-    }
-
-    handleMenuClose = evt => {
-      this.setState({isMenuOpen: false})
     }
 
     handlePublishRequested = () => {
@@ -395,10 +395,10 @@ export default withRouterHOC(
 
     handleConfirmHistoryRestore = () => {
       const {onRestore} = this.props
-      const {historyEvent} = this.state
-      onRestore(historyEvent.value)
-      this.setState({
-        historyEvent: undefined
+      const {selected} = this.state.historyState
+      onRestore(selected.value)
+      this.setHistoryState({
+        selected: null
       })
     }
 
@@ -436,7 +436,7 @@ export default withRouterHOC(
       }
 
       if (item.action === 'browseHistory') {
-        this.setState({showHistory: true})
+        this.handleOpenHistory()
       }
 
       this.setState({isMenuOpen: false})
@@ -574,17 +574,33 @@ export default withRouterHOC(
       )
     }
 
-    handleToggleHistory = () => {
-      this.setState(prevState => {
-        return {
-          showHistory: !prevState.showHistory
-        }
-      })
+    setHistoryState = nextHistoryState => {
+      this.setState(prevState => ({historyState: {...prevState.historyState, ...nextHistoryState}}))
+    }
+
+    handleOpenHistory = () => {
+      if (this.state.historyState.isOpen) {
+        return
+      }
+      const {draft, published} = this.props
+      this.setHistoryState({...INITIAL_HISTORY_STATE, isOpen: true})
+      const events$ = HistoryStore.historyEventsFor(getPublishedId((draft || published)._id)).pipe(
+        map((events, i) => {
+          if (i === 0) {
+            this.setHistoryState({isLoading: false, selectedRev: events[0].rev})
+          }
+          this.setHistoryState({events: events})
+          return events
+        })
+      )
+
+      this._historyEventsSubscription = events$.subscribe()
     }
 
     handleCloseHistory = () => {
-      this.setState({
-        showHistory: false,
+      this._historyEventsSubscription.unsubscribe()
+      this.setHistoryState({
+        isOpen: false,
         historyEvent: undefined
       })
     }
@@ -607,34 +623,25 @@ export default withRouterHOC(
       )
     }
 
-    handleHistorySelect = (event, index) => {
-      this.setState({
-        historyItemIndex: index,
-        historyEvent: event
+    handleHistorySelect = event => {
+      this.setHistoryState({
+        selectedRev: event.rev
       })
-    }
-
-    getDocumentId = value => {
-      if (!value || !value._id) {
-        return null
-      }
-      if (value._id.split('drafts.').length === 2) {
-        return value._id.split('drafts.')[1]
-      }
-      return value._id
     }
 
     renderForm() {
       const {type, markers, draft, published, patchChannel} = this.props
-      const {historyEvent, focusPath, filterField, isReconnecting, historyItemIndex} = this.state
-      if (historyEvent) {
-        return (
+      const {historyState, focusPath, filterField, isReconnecting} = this.state
+      if (historyState.isOpen) {
+        const selectedEvent = historyState.events.find(e => e.rev === historyState.selectedRev)
+        return (historyState.isLoading || !selectedEvent) ? (
+          'Loading…'
+        ) : (
           <HistoryForm
-            value={historyEvent.value}
+            isLatest={selectedEvent === historyState.events[0]}
+            event={selectedEvent}
             schema={schema}
             type={type}
-            isLatest={historyItemIndex === 0}
-            timestamp={historyEvent.timestamp}
           />
         )
       }
@@ -648,7 +655,7 @@ export default withRouterHOC(
           onBlur={this.handleBlur}
           onChange={this.handleChange}
           onFocus={this.handleFocus}
-          onShowHistory={this.handleToggleHistory}
+          onShowHistory={this.handleOpenHistory}
           patchChannel={patchChannel}
           published={published}
           readOnly={isReconnecting || !isActionEnabled(type, 'update')}
@@ -676,9 +683,7 @@ export default withRouterHOC(
         showConfirmUnpublish,
         showConfirmDiscard,
         didPublish,
-        showHistory,
-        historyEvent,
-        historyItemIndex
+        historyState
       } = this.state
 
       const value = draft || published
@@ -706,19 +711,20 @@ export default withRouterHOC(
 
       const enabledActions = resolveEnabledActions(type)
       return (
-        <div className={showHistory ? styles.paneWrapperWithHistory : styles.paneWrapper}>
-          {showHistory && (
+        <div className={historyState.isOpen ? styles.paneWrapperWithHistory : styles.paneWrapper}>
+          {historyState.isOpen && (
             <div className={styles.history}>
               <History
-                documentId={this.getDocumentId(value)}
+                documentId={getPublishedId(value._id)}
                 onClose={this.handleCloseHistory}
                 onItemSelect={this.handleHistorySelect}
-                currentRev={value && value._rev}
                 lastEdited={value && new Date(value._updatedAt)}
-                currentIndex={historyItemIndex}
                 published={published}
                 draft={draft}
-                historyEvent={historyEvent}
+                events={historyState.events}
+                isLoading={historyState.isLoading}
+                error={historyState.error}
+                selectedRev={historyState.selectedRev}
               />
             </div>
           )}
@@ -728,7 +734,7 @@ export default withRouterHOC(
             title={this.getTitle(value)}
             onAction={this.handleMenuAction}
             menuItems={
-              historyEvent
+              historyState.isOpen
                 ? []
                 : getMenuItems(enabledActions, draft, published, this.isLiveEditEnabled())
             }
@@ -737,7 +743,7 @@ export default withRouterHOC(
             isSelected // last pane is always selected for now
             staticContent={this.renderStaticContent()}
             contentMaxWidth={672}
-            minSize={showHistory && 1000}
+            minSize={historyState.isOpen && 1000}
           >
             <div className={styles.pane}>
               {this.renderForm()}
