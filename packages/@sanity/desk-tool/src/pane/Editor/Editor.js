@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import {debounce} from 'lodash'
 import {Tooltip} from 'react-tippy'
 import {withRouterHOC} from 'part:@sanity/base/router'
-import {map} from 'rxjs/operators'
 import {PreviewFields} from 'part:@sanity/base/preview'
 import {getPublishedId, newDraftFrom} from 'part:@sanity/base/util/draft-utils'
 import HistoryStore from 'part:@sanity/base/datastore/history'
@@ -40,6 +39,7 @@ import Actions from './Actions'
 import RestoreHistoryButton from './RestoreHistoryButton'
 import EditForm from './EditForm'
 import HistoryForm from './HistoryForm'
+import {map} from 'rxjs/operators'
 
 function navigateUrl(url) {
   window.open(url)
@@ -271,6 +271,9 @@ export default withRouterHOC(
 
       if (this.duplicate$) {
         this.duplicate$.unsubscribe()
+      }
+      if (this._historyEventsSubscription) {
+        this._historyEventsSubscription.unsubscribe()
       }
     }
 
