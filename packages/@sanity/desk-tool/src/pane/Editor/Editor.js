@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import {debounce} from 'lodash'
 import {Tooltip} from 'react-tippy'
 import {withRouterHOC} from 'part:@sanity/base/router'
+import {map} from 'rxjs/operators'
 import {PreviewFields} from 'part:@sanity/base/preview'
 import {getPublishedId, newDraftFrom} from 'part:@sanity/base/util/draft-utils'
 import HistoryStore from 'part:@sanity/base/datastore/history'
@@ -39,7 +40,6 @@ import Actions from './Actions'
 import RestoreHistoryButton from './RestoreHistoryButton'
 import EditForm from './EditForm'
 import HistoryForm from './HistoryForm'
-import {map} from 'rxjs/operators'
 
 function navigateUrl(url) {
   window.open(url)
@@ -64,11 +64,11 @@ const getUnpublishItem = (draft, published, isLiveEditEnabled) =>
   isLiveEditEnabled
     ? null
     : {
-        action: 'unpublish',
-        title: 'Unpublish…',
-        icon: VisibilityOffIcon,
-        isDisabled: !published
-      }
+      action: 'unpublish',
+      title: 'Unpublish…',
+      icon: VisibilityOffIcon,
+      isDisabled: !published
+    }
 
 const getDeleteItem = (draft, published) => ({
   group: 'danger',
@@ -83,11 +83,11 @@ const getHistoryMenuItem = (draft, published, isLiveEditEnabled) =>
   isLiveEditEnabled
     ? null
     : {
-        action: 'browseHistory',
-        title: 'Browse history',
-        icon: HistoryIcon,
-        isDisabled: !(draft || published)
-      }
+      action: 'browseHistory',
+      title: 'Browse history',
+      icon: HistoryIcon,
+      isDisabled: !(draft || published)
+    }
 
 const getInspectItem = (draft, published) => ({
   action: 'inspect',
@@ -114,7 +114,7 @@ const getProductionPreviewItem = (draft, published) => {
   } catch (error) {
     error.message = `An error was thrown while trying to get production preview url: ${
       error.message
-    }`
+      }`
     // eslint-disable-next-line no-console
     console.error(error)
     return null
