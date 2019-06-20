@@ -79,15 +79,12 @@ const getDeleteItem = (draft, published) => ({
   isDisabled: !draft && !published
 })
 
-const getHistoryMenuItem = (draft, published, isLiveEditEnabled) =>
-  isLiveEditEnabled
-    ? null
-    : {
-        action: 'browseHistory',
-        title: 'Browse history',
-        icon: HistoryIcon,
-        isDisabled: !(draft || published)
-      }
+const getHistoryMenuItem = (draft, published) => ({
+  action: 'browseHistory',
+  title: 'Browse history',
+  icon: HistoryIcon,
+  isDisabled: !(draft || published)
+})
 
 const getInspectItem = (draft, published) => ({
   action: 'inspect',
