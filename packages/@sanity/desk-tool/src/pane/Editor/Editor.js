@@ -473,7 +473,14 @@ export default withRouterHOC(
         return <span>{paneTitle}</span>
       }
       if (historyState.isOpen) {
-        return `History of ${value.title}`
+        return (
+          <>
+            History of{' '}
+            <PreviewFields document={value} type={type} fields={['title']}>
+              {({title}) => (title ? <em>{title}</em> : <em>Untitled</em>)}
+            </PreviewFields>
+          </>
+        )
       }
       if (!value) {
         return `Creating new ${type.title || type.name}`
