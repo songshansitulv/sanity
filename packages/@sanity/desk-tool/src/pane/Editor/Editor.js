@@ -398,7 +398,8 @@ export default withRouterHOC(
           document => {
             onRestore(document)
             this.setHistoryState({
-              selected: null
+              selected: null,
+              isOpen: false
             })
           }
         )
