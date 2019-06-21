@@ -22,6 +22,7 @@ export default class RestoreHistoryButton extends React.PureComponent {
   }
   handleConfirmHistoryRestore = () => {
     const {onRestore} = this.props
+    this.setState({showConfirmHistoryRestore: false})
     onRestore()
   }
   render() {
