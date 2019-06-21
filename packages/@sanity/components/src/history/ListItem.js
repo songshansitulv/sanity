@@ -109,63 +109,58 @@ export default class HistoryListItem extends React.PureComponent {
         {type === 'truncated' && (
           <div className={styles.truncatedInfo}>
             <p>
-              Read about retention times and plans in{' '}
               <a
                 href="https://www.sanity.io/docs/content-studio/history-experience"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                our documentation
+                Learn about history retention
               </a>
-              .
             </p>
           </div>
         )}
-        {users &&
-          users.length > 0 && (
-            <Tooltip
-              html={
-                <PresenceList
-                  markers={users.map(user => ({
-                    type: 'presence',
-                    identity: user.id,
-                    color: colorHasher(user.id),
-                    user: {...user}
-                  }))}
-                />
-              }
-              disabled={users.length < 2}
-              interactive
-              position="top"
-              trigger="mouseenter"
-              animation="scale"
-              arrow
-              theme="light"
-              distance="10"
-              duration={50}
-            >
-              <div className={styles.users}>
-                {users.slice(0, MAX_USERS).map(user => (
-                  <div className={styles.user} key={user.id}>
-                    <PresenceCircle
-                      title={users.length === 1 ? undefined : user.displayName}
-                      showTooltip={false}
-                      imageUrl={user.imageUrl}
-                      color={colorHasher(user.id)}
-                    />
-                  </div>
-                ))}
-                {users.length === 1 && (
-                  <div className={styles.userName}>{users[0].displayName}</div>
-                )}
-                {users.length > 1 && (
-                  <div className={styles.extraItems}>
-                    <div className={styles.userName}>{users.length} people</div>
-                  </div>
-                )}
-              </div>
-            </Tooltip>
-          )}
+        {users && users.length > 0 && (
+          <Tooltip
+            html={
+              <PresenceList
+                markers={users.map(user => ({
+                  type: 'presence',
+                  identity: user.id,
+                  color: colorHasher(user.id),
+                  user: {...user}
+                }))}
+              />
+            }
+            disabled={users.length < 2}
+            interactive
+            position="top"
+            trigger="mouseenter"
+            animation="scale"
+            arrow
+            theme="light"
+            distance="10"
+            duration={50}
+          >
+            <div className={styles.users}>
+              {users.slice(0, MAX_USERS).map(user => (
+                <div className={styles.user} key={user.id}>
+                  <PresenceCircle
+                    title={users.length === 1 ? undefined : user.displayName}
+                    showTooltip={false}
+                    imageUrl={user.imageUrl}
+                    color={colorHasher(user.id)}
+                  />
+                </div>
+              ))}
+              {users.length === 1 && <div className={styles.userName}>{users[0].displayName}</div>}
+              {users.length > 1 && (
+                <div className={styles.extraItems}>
+                  <div className={styles.userName}>{users.length} people</div>
+                </div>
+              )}
+            </div>
+          </Tooltip>
+        )}
         {children && <div className={styles.children}>{children}</div>}
       </div>
     )
