@@ -390,10 +390,6 @@ export default withRouterHOC(
       this.setState({showConfirmUnpublish: false})
     }
 
-    handleShowHistoryRestore = () => {
-      this.setState({showConfirmHistoryRestore: true})
-    }
-
     handleConfirmHistoryRestore = () => {
       const {onRestore} = this.props
       const selectedEvent = this.findSelectedEvent()
@@ -404,7 +400,6 @@ export default withRouterHOC(
             this.setHistoryState({
               selected: null
             })
-            this.setState({showConfirmHistoryRestore: false})
           }
         )
       }
