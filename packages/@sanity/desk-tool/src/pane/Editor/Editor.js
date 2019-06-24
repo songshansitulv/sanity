@@ -41,6 +41,8 @@ import EditForm from './EditForm'
 import HistoryForm from './HistoryForm'
 import {map} from 'rxjs/operators'
 
+const BREAKPOINT_SCREEN_MEDIUM = 512
+
 function navigateUrl(url) {
   window.open(url)
 }
@@ -79,12 +81,17 @@ const getDeleteItem = (draft, published) => ({
   isDisabled: !draft && !published
 })
 
-const getHistoryMenuItem = (draft, published) => ({
-  action: 'browseHistory',
-  title: 'Browse history',
-  icon: HistoryIcon,
-  isDisabled: !(draft || published)
-})
+const getHistoryMenuItem = (draft, published) => {
+  if (window && window.innerWidth > BREAKPOINT_SCREEN_MEDIUM) {
+    return {
+      action: 'browseHistory',
+      title: 'Browse history',
+      icon: HistoryIcon,
+      isDisabled: !(draft || published)
+    }
+  }
+  return null
+}
 
 const getInspectItem = (draft, published) => ({
   action: 'inspect',
@@ -727,20 +734,18 @@ export default withRouterHOC(
       return (
         <div className={historyState.isOpen ? styles.paneWrapperWithHistory : styles.paneWrapper}>
           {historyState.isOpen && (
-            <div className={styles.history}>
-              <History
-                documentId={getPublishedId(value._id)}
-                onClose={this.handleCloseHistory}
-                onItemSelect={this.handleHistorySelect}
-                lastEdited={value && new Date(value._updatedAt)}
-                published={published}
-                draft={draft}
-                events={historyState.events}
-                isLoading={historyState.isLoading}
-                error={historyState.error}
-                selectedEvent={this.findSelectedEvent()}
-              />
-            </div>
+            <History
+              documentId={getPublishedId(value._id)}
+              onClose={this.handleCloseHistory}
+              onItemSelect={this.handleHistorySelect}
+              lastEdited={value && new Date(value._updatedAt)}
+              published={published}
+              draft={draft}
+              events={historyState.events}
+              isLoading={historyState.isLoading}
+              error={historyState.error}
+              selectedEvent={this.findSelectedEvent()}
+            />
           )}
           <Pane
             styles={this.props.paneStyles}

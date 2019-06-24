@@ -2,6 +2,7 @@
 
 .root {
   min-width: 260px;
+  max-width: 320px;
   background-color: var(--gray-lightest);
   height: 100%;
   width: 100%;

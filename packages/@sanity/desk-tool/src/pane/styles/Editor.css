@@ -25,20 +25,6 @@
   composes: paneWrapper;
 }
 
-.history {
-  /* animation-name: showHistory;
-  animation-duration: 200ms;
-  animation-timing-function: linear;
-  animation-iteration-count: 1; */
-  position: relative;
-  width: calc(100vw - 3rem);
-
-  @media (--screen-medium) {
-    position: relative;
-    width: unset;
-  }
-}
-
 .pane {
   display: block;
   position: relative; /* Needed to keep the spinners in place */
