@@ -11,18 +11,23 @@
 }
 
 .paneWrapper {
-  display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  height: 100%;
-  width: 100%;
-  justify-content: stretch;
+  @media (--screen-medium) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+  }
 }
 
 .paneWrapperWithHistory {
   composes: paneWrapper;
+
+  @media (--screen-medium) {
+    justify-content: stretch;
+    display: flex;
+  }
 }
 
 .pane {
