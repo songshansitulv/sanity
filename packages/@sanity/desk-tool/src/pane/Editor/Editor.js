@@ -35,6 +35,7 @@ import InspectHistory from '../../components/InspectHistory'
 import DocTitle from '../../components/DocTitle'
 import History from '../History'
 import styles from '../styles/Editor.css'
+import {IncomingLinks} from '../IncomingLinks'
 import Actions from './Actions'
 import RestoreHistoryButton from './RestoreHistoryButton'
 import EditForm from './EditForm'
@@ -809,6 +810,11 @@ export default withRouterHOC(
             minSize={historyState.isOpen && 1000}
           >
             <div className={styles.pane}>
+              {value && (
+                <div className={styles.top}>
+                  <IncomingLinks id={value._id} />
+                </div>
+              )}
               {this.renderForm()}
 
               {afterEditorComponents.map((AfterEditorComponent, i) => (
