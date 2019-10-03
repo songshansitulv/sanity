@@ -1,17 +1,17 @@
 #### Table of Contents
 
 - [Contributing](#contributing)
-  - [Code of Conduct](#code-of-conduct)
-  - [What is the Sanity Studio](#what-is-the-sanity-studio)
-- [Submitting requests or reporting issues](#submitting-requests-or-reporting-issues)
-  - [Accepted contributions](#accepted-contributions)
-    - [Security issues](#security-issues)
-    - [Bug reports](#bug-reports)
-    - [Feature Requests or enhancements](#feature-requests-or-enhancements)
-    - [Pull Request](#pull-requests)
-- [Setting up Sanity locally](#setting-up-sanity-locally)
-  - [Working on fixes or features](#working-on-fixes-or-feature)
-- [General info](#general-ingo)
+  - [Code of Conduct](#codeofconduct)
+  - [What is the Sanity Studio](#whatisthesanitystudio)
+- [Submitting requests or reporting issues](#submittingrequests-or-reporting-issues)
+  - [Accepted contributions](#acceptedcontributions)
+    - [Security issues](#securityissues)
+    - [Bug reports](#bugreports)
+    - [Feature Requests or enhancements](#featurerequestsorenhancements)
+    - [Pull Request](#pullrequests)
+- [Setting up Sanity locally](#settingupsanitylocally)
+  - [Working on fixes or features](#workingonfixesorfeatures)
+- [General info](#general-info)
   - [Troubleshooting](#troubleshooting)
   - [Testing](#testing)
 
@@ -44,7 +44,7 @@ Want to submit a security issue, bug report or feature request? Pleas
 - New features\*
 - Documentation improvements
 
-\*New features are unlikely to be accepted and are better developed and published as plugins that extend the existing functionality of the Sanity Studio. See [Developing new features](#developing-new-features) for more info.
+\*New features are unlikely to be accepted and are better developed and published as plugins that extend the existing functionality of the Sanity Studio. See [New features](#new-features) for more info.
 
 ### Security issues
 
@@ -140,7 +140,7 @@ Next, start the Test Studio by running `npm run start` in the terminal
 npm run start
 ```
 
-## Working on fixes or feature
+## Working on fixes or features
 
 Please create a new branch branch for the fix or feature/enhancement you want to work on and regularly push your work to this branch. Remember to also keep your branch up to date by rebasing it regularly against the original `next` branch. To do this, add the original Sanity repository as a remote (in our example we called it `upstream`).
 
@@ -149,7 +149,9 @@ git remote add upstream git@github.com:sanity-io/sanity.git
 git pull upstream next --rebase
 ```
 
-Please note that if you would like to develop a new feature for the Sanity Studio, we are sad to say that it's unlikely we will be able to accept it. However, we highly recommend that you develop and publish your new feature as a plugin. Plugins can be [parts](https://www.sanity.io/docs/extending/parts), [custom input components](https://www.sanity.io/docs/extending/custom-input-widgets), [dashboard widgets](https://www.sanity.io/docs/dashboard/creating-your-own-widget), and [Studio themes](https://www.sanity.io/docs/guides/how-to-brand-your-studio) that others can use to customize and extend the functionality of their Sanity Studio.
+### New features
+
+Please note that if you would like to develop a new feature for the Sanity Studio, it's unlikely that we will be able to accept your contribution. However, we highly recommend that you develop and publish your new feature as a plugin. Plugins can be [parts](https://www.sanity.io/docs/extending/parts), [custom input components](https://www.sanity.io/docs/extending/custom-input-widgets), [dashboard widgets](https://www.sanity.io/docs/dashboard/creating-your-own-widget), and [Studio themes](https://www.sanity.io/docs/guides/how-to-brand-your-studio) that you and others can use to customize and extend the functionality of the Sanity Studio.
 
 # General info
 
@@ -158,10 +160,10 @@ Please note that if you would like to develop a new feature for the
 - Commit to that branch locally and regularly push your work to the same named branch
 - Rebase your feature branch regularily against `next`. Make sure its even with `next` before creating a Pull Request or merging
 - Pull Requests should be as ready as possible for merge and the Pull Request template should be filled out to the best of your ability or in a way that is appropriate. Unless stated otherwise, it should also be safe to assume that:
-- The changes/feature are reviewed and tested by you
-- You think it's production ready
-- The code is linted and the test suite is passing
-- It's fine to open a Pull Request to start a discussion/ask for help but it should be opened as a Draft Pull Request and clearly state that it's not yet ready for merge
+  - The changes/feature are reviewed and tested by you
+  - You think it's production ready
+  - The code is linted and the test suite is passing
+  - It's fine to open a Pull Request to start a discussion/ask for help but it should be opened as a Draft Pull Request and clearly state that it's not yet ready for merge
 
 ## Troubleshooting
 
