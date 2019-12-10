@@ -1,0 +1,11 @@
+.root {
+  @nest & > div {
+    display: inline-block;
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  @nest & > div + div {
+    margin-left: -0.25em;
+  }
+}

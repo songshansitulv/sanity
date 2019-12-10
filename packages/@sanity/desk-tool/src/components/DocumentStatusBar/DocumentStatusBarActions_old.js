@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import React from 'react'
+// import React from 'react'
 import {Tooltip} from 'react-tippy'
 import ChevronDownIcon from 'part:@sanity/base/chevron-down-icon'
 import Button from 'part:@sanity/components/buttons/default'
@@ -175,9 +175,8 @@ export class DocumentStatusBarActions extends React.PureComponent {
   render() {
     const {actions, idPrefix, isDisconnected} = this.props
     const {isMenuOpen} = this.state
-    const firstAction = actions[0]
-    const [primary, ...rest] = actions
-    const hasMoreActions = rest.length > 0
+    const [firstAction, ...restActions] = actions
+    const hasMoreActions = restActions.length > 0
     const firstActionDisabled =
       firstAction && (!firstAction.handleClick || isDisconnected || firstAction.disabled)
 

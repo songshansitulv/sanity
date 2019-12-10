@@ -1,0 +1,24 @@
+{
+  "parts": [
+    {
+      "implements": "part:@sanity/base/tool",
+      "path": "./tool"
+    },
+    {
+      "implements": "part:@sanity/plugin-review-workflow/document-actions",
+      "path": "./documentActions"
+    },
+    {
+      "implements": "part:@sanity/plugin-review-workflow/schemas",
+      "path": "./schemas"
+    },
+    {
+      "implements": "part:@sanity/plugin-review-workflow/structure",
+      "path": "./structure"
+    },
+    {
+      "implements": "part:@sanity/plugin-review-workflow/components/--hack-metadata-syncer-field",
+      "path": "components/__hack_metadataSyncerField/MetadataSyncerField"
+    }
+  ]
+}

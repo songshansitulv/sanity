@@ -1,0 +1,13 @@
+.root {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 1.5em;
+}
+
+.displayName {
+  margin-left: 0.5em;
+  font-size: 14px;
+}

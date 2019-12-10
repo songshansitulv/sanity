@@ -1,4 +1,4 @@
-@import "part:@sanity/base/theme/variables-style";
+@import 'part:@sanity/base/theme/variables-style';
 
 :root {
   --nav-bar-box: 3.0625em; /* 49px */
@@ -32,7 +32,8 @@
   width: 100vw;
   flex-direction: column;
   box-sizing: border-box;
-  min-height: calc(100vh - var(--nav-bar-box));
+  min-height: 100vh;
+  /* min-height: calc(100vh - var(--nav-bar-box)); */
 
   @nest &::before {
     content: '';

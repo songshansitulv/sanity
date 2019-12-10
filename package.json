@@ -22,6 +22,7 @@
     "typecheck": "lerna run typecheck",
     "start": "npm run test-studio",
     "ecommerce-studio": "gulp ecommerce-studio",
+    "demo-workflow-actions": "gulp demo-workflow-actions",
     "test-studio": "gulp test-studio",
     "clean-studio": "gulp clean-studio",
     "example-studio": "gulp example-studio",

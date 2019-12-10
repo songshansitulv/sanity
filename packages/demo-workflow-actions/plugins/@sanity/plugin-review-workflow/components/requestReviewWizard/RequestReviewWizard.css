@@ -1,0 +1,7 @@
+.buttonContainer {
+  padding: 0 0.5em 0.5em;
+
+  @nest & > * {
+    width: 100%;
+  }
+}

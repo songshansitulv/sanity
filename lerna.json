@@ -14,7 +14,8 @@
     "packages/movies-studio",
     "packages/sanity",
     "packages/storybook",
-    "packages/test-studio"
+    "packages/test-studio",
+    "packages/demo-workflow-actions"
   ],
   "version": "0.147.4"
 }

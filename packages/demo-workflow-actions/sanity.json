@@ -1,0 +1,41 @@
+{
+  "root": true,
+  "project": {
+    "name": "Workflow actions demo"
+  },
+  "api": {
+    "projectId": "m2begyfh",
+    "dataset": "production"
+  },
+  "plugins": [
+    "@sanity/base",
+    "@sanity/components",
+    "@sanity/default-layout",
+    "@sanity/default-login",
+    "@sanity/desk-tool",
+    "@sanity/plugin-review-workflow"
+  ],
+  "env": {
+    "development": {
+      "plugins": ["@sanity/vision"]
+    }
+  },
+  "parts": [
+    {
+      "implements": "part:@sanity/base/document-actions/resolver",
+      "path": "actions/document"
+    },
+    {
+      "name": "part:@sanity/base/schema",
+      "path": "schema"
+    },
+    {
+      "name": "part:@sanity/desk-tool/structure",
+      "path": "structure"
+    },
+    {
+      "implements": "part:@sanity/plugin-review-workflow/config",
+      "path": "reviewWorkflow/config"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+.root {
+  padding: 0.5em 0;
+  min-width: 240px;
+}
+
+.selectedUserList {
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+
+.emptyUserList {
+  composes: selectedUserList;
+  padding: 0.5em;
+}
+
+.search {
+  padding: 0.5em;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5em 0;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.menuButton {
+  -webkit-font-smoothing: inherit;
+  -webkit-appearance: none;
+  display: block;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  /* font-size: 14px; */
+  line-height: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+
+  @nest & > div {
+    padding: 0.5em 0.75em;
+    outline: none;
+  }
+
+  @nest &:hover > div {
+    background: #def;
+  }
+}
+
+.menuItem {
+  -webkit-font-smoothing: inherit;
+  -webkit-appearance: none;
+  display: block;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+
+  @nest & > div {
+    padding: 0.5em 0.75em;
+    outline: none;
+  }
+
+  @nest &:hover > div {
+    background: #def;
+  }
+}
+
+.userOption {
+  display: flex;
+  align-items: center;
+}
+
+.userCheckbox {
+  width: 1em;
+  margin-left: 0.75em;
+
+  @nest & > input {
+    display: none;
+  }
+}
+
+.userCheckboxIcon {
+  display: none;
+
+  @nest input:checked + & {
+    display: block;
+  }
+}
+
+.userCard {
+  flex: 1;
+}
