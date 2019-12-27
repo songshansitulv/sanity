@@ -44,3 +44,5 @@ script:
 
   # Test building the project with latest dependencies
   - sanity build --skip-minify
+after_success:
+  - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
